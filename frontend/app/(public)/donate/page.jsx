@@ -100,7 +100,7 @@ function ManualDonationFormInner() {
       if (projectId) fd.append("projectId", projectId)
       if (campaignId) fd.append("campaignId", campaignId)
       if (file) fd.append("paymentProof", file)
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/donations/manual`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"}/donations/manual`, {
         method: "POST", body: fd,
       })
       const data = await res.json()
@@ -302,7 +302,7 @@ export default function DonatePage() {
             <div className="rounded-2xl border border-border/70 bg-gradient-to-b from-white to-secondary/20 p-8 shadow-sm">
               <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start">
                 <div className="flex size-40 shrink-0 flex-col items-center justify-center rounded-2xl border border-border bg-white shadow-md text-center ring-4 ring-secondary/50 p-3">
-                  <QRCodeSVG 
+                  <QRCodeSVG
                     value={`upi://pay?pa=${BANK.upi}&pn=${encodeURIComponent(BANK.accountName)}&cu=INR`}
                     size={110}
                     level="Q"

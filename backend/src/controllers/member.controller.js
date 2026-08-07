@@ -94,9 +94,9 @@ exports.approveMember = async (req, res) => {
         member.membershipStatus = "approved";
 
         // Generate QR Code containing member verification link
-        const verificationLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-member/${member.memberId}`;
+        const verificationLink = `${process.env.FRONTEND_URL || "https://real-human-trust-nu.vercel.app"}/verify-member/${member.memberId}`;
         const qrCodeData = await QRCode.toDataURL(verificationLink);
-        
+
         member.qrCode = qrCodeData;
 
         await member.save();
@@ -151,7 +151,7 @@ exports.createMemberDirectly = async (req, res) => {
         if (!user) {
             // Create user
             if (!password) {
-                 return res.status(400).json({ success: false, message: "Please provide a password for the new user account" });
+                return res.status(400).json({ success: false, message: "Please provide a password for the new user account" });
             }
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
@@ -163,7 +163,7 @@ exports.createMemberDirectly = async (req, res) => {
         // 2. Check if member already exists for this user
         const existingMember = await Member.findOne({ user: user._id });
         if (existingMember) {
-             return res.status(400).json({ success: false, message: "This user is already a member" });
+            return res.status(400).json({ success: false, message: "This user is already a member" });
         }
 
         const memberId = generateMemberId();
@@ -180,14 +180,14 @@ exports.createMemberDirectly = async (req, res) => {
         });
 
         // 4. Generate QR Code
-        const verificationLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-member/${member.memberId}`;
+        const verificationLink = `${process.env.FRONTEND_URL || "https://real-human-trust-nu.vercel.app"}/verify-member/${member.memberId}`;
         member.qrCode = await QRCode.toDataURL(verificationLink);
         await member.save();
 
         const populatedMember = await Member.findById(member._id).populate("user", "fullName email mobile role");
 
         res.status(201).json({ success: true, message: "Member created and approved successfully", data: populatedMember });
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
 };

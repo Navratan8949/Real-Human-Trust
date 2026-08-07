@@ -23,7 +23,7 @@ exports.createAppointmentLetter = async (req, res) => {
         // 1. Generate PDF
         const pdfFileName = `${letterNo}.pdf`;
         const localPdfPath = path.join(__dirname, "..", "..", "public", "uploads", "appointments", pdfFileName);
-        
+
         // Ensure directory exists
         const dirPath = path.dirname(localPdfPath);
         if (!fs.existsSync(dirPath)) {
@@ -38,7 +38,7 @@ exports.createAppointmentLetter = async (req, res) => {
         doc.moveDown();
         doc.fontSize(16).text("APPOINTMENT LETTER", { align: "center" });
         doc.moveDown();
-        
+
         doc.fontSize(12).text(`Letter No: ${letterNo}`, { align: "right" });
         doc.text(`Date: ${new Date().toLocaleDateString()}`, { align: "right" });
         doc.moveDown();
@@ -59,10 +59,10 @@ exports.createAppointmentLetter = async (req, res) => {
         doc.moveDown();
         doc.text("We believe your skills and experience will be an excellent match for our organization. We look forward to your positive impact in our NGO's mission.");
         doc.moveDown(2);
-        
+
         doc.text("Sincerely,");
         doc.moveDown();
-        
+
         const signaturePath = path.join(__dirname, "..", "..", "public", "images", "signature.png");
         if (fs.existsSync(signaturePath)) {
             doc.image(signaturePath, { width: 120 });
@@ -70,17 +70,17 @@ exports.createAppointmentLetter = async (req, res) => {
         } else {
             doc.text("_______________________");
         }
-        
+
         doc.text("Authorized Signatory");
         doc.text("Real Human Education & Charitable Trust");
-        
+
         doc.end();
 
         // 2. Save to database when PDF is completely written
         writeStream.on("finish", async () => {
             try {
-                const pdfUrl = `http://localhost:8000/public/uploads/appointments/${pdfFileName}`;
-                
+                const pdfUrl = `https://real-human-trust.onrender.com/public/uploads/appointments/${pdfFileName}`;
+
                 const appointmentLetter = await AppointmentLetter.create({
                     member: memberId,
                     letterNo,
