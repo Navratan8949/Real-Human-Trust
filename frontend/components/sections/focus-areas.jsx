@@ -1,0 +1,111 @@
+import Image from "next/image"
+import { Apple, GraduationCap, HeartPulse, Sprout, TreePine, Users2, ArrowRight } from "lucide-react"
+import { SectionHeading } from "@/components/shared/section-heading"
+import { Reveal } from "@/components/shared/reveal"
+
+const AREAS = [
+  {
+    icon: GraduationCap,
+    title: "Education",
+    desc: "Free coaching centres, school sponsorships, books and digital learning for children in need.",
+    image: "/rural-classroom-children-learning-india.png",
+    color: "from-blue-600/80 to-navy/90",
+  },
+  {
+    icon: HeartPulse,
+    title: "Healthcare",
+    desc: "Medical camps, mobile health units and awareness drives bringing care to remote villages.",
+    image: "/community-health-camp-india.png",
+    color: "from-rose-600/80 to-navy/90",
+  },
+  {
+    icon: Apple,
+    title: "Nutrition",
+    desc: "Community kitchens serving daily nutritious meals to the hungry and vulnerable.",
+    image: "/community-kitchen-serving-food-india.png",
+    color: "from-orange-600/80 to-navy/90",
+  },
+  {
+    icon: Users2,
+    title: "Empowerment",
+    desc: "Skill development and micro-enterprise training that helps women stand independently.",
+    image: "/women-skill-training-workshop-india.png",
+    color: "from-violet-600/80 to-navy/90",
+  },
+  {
+    icon: TreePine,
+    title: "Environment",
+    desc: "Tree plantation and sustainability drives for a greener, healthier tomorrow.",
+    image: "/tree-plantation-volunteers-india.png",
+    color: "from-emerald-600/80 to-navy/90",
+  },
+  {
+    icon: Sprout,
+    title: "Relief & Welfare",
+    desc: "Rapid disaster relief, ration kits and support for families during times of crisis.",
+    image: "/about-volunteers-india.png",
+    color: "from-amber-600/80 to-navy/90",
+  },
+]
+
+export function FocusAreas() {
+  return (
+    <section className="bg-background py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4">
+        <SectionHeading
+          eyebrow="What We Do"
+          title="Our areas of impact"
+          description="Six focused programs working together to uplift communities and create lasting, measurable change."
+        />
+        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {AREAS.map((a, i) => (
+            <Reveal key={a.title} delay={(i % 3) * 0.1}>
+              <div className="group relative h-[380px] w-full overflow-hidden rounded-2xl bg-navy shadow-xl">
+                {/* Background Image */}
+                <Image
+                  src={a.image}
+                  alt={a.title}
+                  fill
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+
+                {/* Default Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-0" />
+
+                {/* Hover Colored Gradient Overlay */}
+                <div className={`absolute inset-0 bg-gradient-to-t ${a.color} opacity-0 transition-opacity duration-500 group-hover:opacity-90`} />
+
+                {/* Content Container */}
+                <div className="absolute inset-0 flex flex-col justify-end p-8 transition-transform duration-500">
+                  {/* Icon */}
+                  <div className="mb-4 inline-flex size-14 items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur-md ring-1 ring-white/20 transition-transform duration-500 group-hover:-translate-y-2">
+                    <a.icon className="size-7" />
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="font-serif text-2xl font-bold text-white transition-transform duration-500 group-hover:-translate-y-2">
+                    {a.title}
+                  </h3>
+
+                  {/* Description (Slides up on hover) */}
+                  <div className="grid grid-rows-[0fr] transition-all duration-500 ease-in-out group-hover:grid-rows-[1fr]">
+                    <div className="overflow-hidden">
+                      <p className="mt-3 text-sm leading-relaxed text-white/90 opacity-0 transition-opacity duration-500 delay-100 group-hover:opacity-100">
+                        {a.desc}
+                      </p>
+
+                      {/* <button className="mt-5 flex items-center text-sm font-bold tracking-widest text-white opacity-0 transition-opacity duration-500 delay-200 group-hover:opacity-100">
+                        LEARN MORE <ArrowRight className="ml-2 size-4" />
+                      </button> */}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

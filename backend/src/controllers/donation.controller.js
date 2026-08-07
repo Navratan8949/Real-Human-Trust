@@ -1,0 +1,274 @@
+const Donation = require("../models/Donation");
+const Member = require("../models/Member");
+const Project = require("../models/Project");
+const Crowdfunding = require("../models/Crowdfunding");
+const Razorpay = require("razorpay");
+const crypto = require("crypto");
+const pdf = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
+const nodemailer = require("nodemailer");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { generateReceiptPDF } = require("../utils/generatePDF");
+
+// Initialize Razorpay
+const razorpayInstance = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_mockkeyid",
+    key_secret: process.env.RAZORPAY_KEY_SECRET || "mockkeysecret",
+});
+
+// Configure Nodemailer
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER || "test@gmail.com",
+        pass: process.env.EMAIL_PASS || "testpassword",
+    },
+});
+
+const generateReceiptNumber = () => {
+    return "RHT-REC-" + Date.now().toString().slice(-6);
+};
+
+exports.createOrder = async (req, res) => {
+    try {
+        const { amount, paymentMethod, message, fullName, email, phone, purpose, upiId, projectId, campaignId } = req.body;
+
+        // Optionally link to member if logged in
+        let memberId = null;
+        if (req.user && req.user.id) {
+            const member = await Member.findOne({ user: req.user.id });
+            if (member) memberId = member._id;
+        }
+
+        const options = {
+            amount: amount * 100, // amount in the smallest currency unit
+            currency: "INR",
+            receipt: generateReceiptNumber(),
+        };
+
+        const order = await razorpayInstance.orders.create(options);
+
+        if (!order) {
+            return res.status(500).json({ success: false, message: "Error creating Razorpay order" });
+        }
+
+        const donation = await Donation.create({
+            member: memberId,
+            fullName,
+            email,
+            phone,
+            purpose,
+            upiId,
+            amount,
+            paymentMethod: paymentMethod || "online",
+            receiptNumber: options.receipt,
+            message,
+            paymentId: "pending",
+            project: projectId || null,
+            campaign: campaignId || null,
+        });
+
+        res.status(200).json({ success: true, order, donationId: donation._id });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.verifyPayment = async (req, res) => {
+    try {
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, donationId } = req.body;
+
+        const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+        const expectedSignature = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET || "mockkeysecret")
+            .update(body.toString())
+            .digest("hex");
+
+        const isAuthentic = expectedSignature === razorpay_signature;
+
+        if (isAuthentic) {
+            const donation = await Donation.findById(donationId).populate({
+                path: "member",
+                populate: { path: "user", select: "fullName email" }
+            });
+
+            if (!donation) {
+                return res.status(404).json({ success: false, message: "Donation record not found" });
+            }
+
+            donation.paymentId = razorpay_payment_id;
+            donation.paymentStatus = "success";
+            await donation.save();
+
+            // If donation is linked to a project, increment raisedAmount
+            if (donation.project) {
+                await Project.findByIdAndUpdate(donation.project, {
+                    $inc: { raisedAmount: donation.amount }
+                });
+            }
+
+            // If donation is linked to a campaign, increment raisedAmount
+            if (donation.campaign) {
+                await Crowdfunding.findByIdAndUpdate(donation.campaign, {
+                    $inc: { raisedAmount: donation.amount }
+                });
+            }
+
+            // Generate PDF Receipt
+            const donorName = donation.fullName || (donation.member && donation.member.user && donation.member.user.fullName) || "Donor";
+            const donorEmail = donation.email || (donation.member && donation.member.user && donation.member.user.email) || "";
+            
+            const pdfPath = await generateReceiptPDF(donation, donorName, donorEmail);
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER || "test@gmail.com",
+                to: donorEmail,
+                subject: "Donation Receipt - Real Human Trust",
+                text: "Thank you for your donation. Please find your 80G receipt attached.",
+                attachments: [
+                    {
+                        filename: `Receipt-${donation.receiptNumber}.pdf`,
+                        path: pdfPath,
+                    },
+                ],
+            };
+
+            try {
+                await transporter.sendMail(mailOptions);
+            } catch (emailError) {
+                console.error("Error sending email:", emailError);
+            }
+
+            res.status(200).json({ success: true, message: "Payment verified successfully" });
+        } else {
+            res.status(400).json({ success: false, message: "Invalid Signature" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getAllDonations = async (req, res) => {
+    try {
+        const donations = await Donation.find().populate({
+            path: "member",
+            populate: { path: "user", select: "fullName email" }
+        }).populate("project", "title").populate("campaign", "title").sort("-createdAt");
+
+        res.status(200).json({ success: true, count: donations.length, donations });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.getMyDonations = async (req, res) => {
+    try {
+        const member = await Member.findOne({ user: req.user.id });
+        if (!member) {
+            return res.status(404).json({ success: false, message: "Member not found" });
+        }
+
+        const donations = await Donation.find({ member: member._id }).populate("project", "title").populate("campaign", "title").sort("-createdAt");
+        res.status(200).json({ success: true, count: donations.length, donations });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.createManualDonation = async (req, res) => {
+    try {
+        const { amount, paymentMethod, transactionId, message, fullName, email, phone, purpose, upiId, projectId, campaignId } = req.body;
+        
+        let memberId = null;
+        if (req.user && req.user.id) {
+            const member = await Member.findOne({ user: req.user.id });
+            if (member) memberId = member._id;
+        }
+
+        let paymentProof = { public_id: "", url: "" };
+        if (req.file) {
+            const uploadResult = await uploadOnCloudinary(req.file.path);
+            if (uploadResult) {
+                paymentProof = { public_id: uploadResult.public_id, url: uploadResult.url };
+            }
+        }
+
+        const donation = await Donation.create({
+            member: memberId,
+            fullName,
+            email,
+            phone,
+            purpose,
+            upiId,
+            amount,
+            paymentMethod,
+            transactionId,
+            receiptNumber: generateReceiptNumber(),
+            message,
+            paymentId: "manual",
+            paymentStatus: "pending",
+            paymentProof,
+            project: projectId || null,
+            campaign: campaignId || null,
+        });
+
+        res.status(201).json({ success: true, message: "Manual donation submitted for verification.", donation });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.verifyManualDonation = async (req, res) => {
+    try {
+        const { status } = req.body; // "verified" or "rejected"
+        const donation = await Donation.findById(req.params.id).populate({
+            path: "member",
+            populate: { path: "user", select: "fullName email" }
+        });
+
+        if (!donation) return res.status(404).json({ success: false, message: "Donation not found" });
+
+        donation.paymentStatus = status;
+        await donation.save();
+
+        if (status === "verified") {
+            // Increment project's raisedAmount if linked
+            if (donation.project) {
+                await Project.findByIdAndUpdate(donation.project, {
+                    $inc: { raisedAmount: donation.amount }
+                });
+            }
+
+            // Increment campaign's raisedAmount if linked
+            if (donation.campaign) {
+                await Crowdfunding.findByIdAndUpdate(donation.campaign, {
+                    $inc: { raisedAmount: donation.amount }
+                });
+            }
+
+            const donorName = donation.fullName || (donation.member && donation.member.user && donation.member.user.fullName) || "Donor";
+            const donorEmail = donation.email || (donation.member && donation.member.user && donation.member.user.email) || "";
+            
+            const pdfPath = await generateReceiptPDF(donation, donorName, donorEmail);
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER || "test@gmail.com",
+                to: donorEmail,
+                subject: "Donation Receipt - Real Human Trust",
+                text: "Your offline donation has been verified! Please find your 80G receipt attached.",
+                attachments: [{ filename: `Receipt-${donation.receiptNumber}.pdf`, path: pdfPath }],
+            };
+            try {
+                await transporter.sendMail(mailOptions);
+            } catch (emailError) {
+                console.error("Error sending email:", emailError);
+            }
+        }
+
+        res.status(200).json({ success: true, message: `Donation ${status}`, donation });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
