@@ -2,6 +2,13 @@ const mongoose = require("mongoose");
 
 const donationSchema = new mongoose.Schema(
     {
+        // Optional user reference if logged in
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
+
         // Optional member reference if logged in
         member: {
             type: mongoose.Schema.Types.ObjectId,

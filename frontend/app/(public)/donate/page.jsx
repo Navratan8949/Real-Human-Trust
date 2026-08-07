@@ -16,6 +16,7 @@ import { toast } from "sonner"
 import { getProjectById } from "@/service/project.service"
 import { getCrowdfundingById } from "@/service/crowdfunding.service"
 import { QRCodeSVG } from "qrcode.react"
+import Script from "next/script"
 
 // Bank / UPI details
 const BANK = {
@@ -91,8 +92,76 @@ function ManualDonationFormInner() {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
+  async function handleRazorpayPayment() {
+    setLoading(true)
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"
+      const res = await fetch(`${apiBase}/donations/create-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, amount, projectId, campaignId })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || "Order creation failed")
+
+      const { order, donationId } = data
+
+      if (typeof window.Razorpay === "undefined") {
+        throw new Error("Razorpay SDK failed to load. Please refresh the page.")
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TMqxkUch9orx96",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Real Human Education & Charitable Trust",
+        description: form.purpose || "Donation",
+        order_id: order.id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch(`${apiBase}/donations/verify-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                donationId
+              })
+            })
+            const verifyData = await verifyRes.json()
+            if (!verifyRes.ok) throw new Error(verifyData.message || "Payment verification failed")
+            toast.success("Payment successful! 80G Receipt sent to your email.")
+            setForm({ fullName: "", email: "", phone: "", paymentMethod: "online", transactionId: "", purpose: "" })
+            setAmount("")
+          } catch (err) {
+            toast.error(err.message || "Payment verification failed")
+          }
+        },
+        prefill: {
+          name: form.fullName,
+          email: form.email,
+          contact: form.phone
+        },
+        theme: {
+          color: "#16307a"
+        }
+      }
+
+      const rzp = new window.Razorpay(options)
+      rzp.open()
+    } catch (err) {
+      toast.error(err.message || "Razorpay initiation failed")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function onSubmit(e) {
     e.preventDefault()
+    if (form.paymentMethod === "online") {
+      return handleRazorpayPayment()
+    }
     setLoading(true)
     try {
       const fd = new FormData()
@@ -116,107 +185,127 @@ function ManualDonationFormInner() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4">
-      {linkedTitle && (
-        <div className="mb-2 flex items-start gap-3 rounded-xl border border-lime/30 bg-lime/10 px-4 py-3 text-sm text-[#050a30]">
-          <Info className="mt-0.5 size-5 shrink-0 text-[#138808]" />
-          <div>
-            <p className="font-medium text-[#138808]">Linked {linkedType}</p>
-            <p className="font-semibold text-foreground">You are donating specifically to: {linkedTitle}</p>
+    <>
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+      <form onSubmit={onSubmit} className="grid gap-4">
+        {linkedTitle && (
+          <div className="mb-2 flex items-start gap-3 rounded-xl border border-lime/30 bg-lime/10 px-4 py-3 text-sm text-[#050a30]">
+            <Info className="mt-0.5 size-5 shrink-0 text-[#138808]" />
+            <div>
+              <p className="font-medium text-[#138808]">Linked {linkedType}</p>
+              <p className="font-semibold text-foreground">You are donating specifically to: {linkedTitle}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Quick amount selector */}
+        <div>
+          <Label className="mb-2 block text-sm font-semibold">Select Amount (₹) *</Label>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            {QUICK_AMOUNTS.map(a => (
+              <button key={a} type="button"
+                onClick={() => setAmount(String(a))}
+                className={`rounded-xl border py-2.5 text-sm font-bold transition ${amount === String(a)
+                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                  : "border-border/70 bg-card hover:border-accent/50 hover:bg-accent/8"}`}
+              >
+                ₹{a >= 1000 ? (a / 1000) + "K" : a}
+              </button>
+            ))}
+          </div>
+          <Input
+            className="mt-2 h-11 rounded-xl"
+            type="number"
+            placeholder="Or enter custom amount"
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            required
+            min={1}
+          />
+        </div>
+
+        {/* Personal info */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <Label>Full Name *</Label>
+            <Input className="h-11 rounded-xl" value={form.fullName} onChange={e => set("fullName", e.target.value)} required />
+          </div>
+          <div className="grid gap-2">
+            <Label>Email *</Label>
+            <Input type="email" className="h-11 rounded-xl" value={form.email} onChange={e => set("email", e.target.value)} required />
           </div>
         </div>
-      )}
-
-      {/* Quick amount selector */}
-      <div>
-        <Label className="mb-2 block text-sm font-semibold">Select Amount (₹)</Label>
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
-          {QUICK_AMOUNTS.map(a => (
-            <button key={a} type="button"
-              onClick={() => setAmount(String(a))}
-              className={`rounded-xl border py-2.5 text-sm font-bold transition ${amount === String(a)
-                ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                : "border-border/70 bg-card hover:border-accent/50 hover:bg-accent/8"}`}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-2">
+            <Label>Phone Number *</Label>
+            <Input className="h-11 rounded-xl" value={form.phone} onChange={e => set("phone", e.target.value)} required />
+          </div>
+          <div className="grid gap-2">
+            <Label>Payment Method *</Label>
+            <select
+              className="h-11 w-full max-w-full truncate rounded-xl border border-input bg-background px-3 text-xs sm:text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+              value={form.paymentMethod}
+              onChange={e => set("paymentMethod", e.target.value)}
             >
-              ₹{a >= 1000 ? (a / 1000) + "K" : a}
-            </button>
-          ))}
+              <option value="online">Online (Razorpay / Cards / UPI)</option>
+              <option value="upi">Direct UPI (QR / VPA)</option>
+              <option value="bank">Bank Transfer (NEFT / RTGS)</option>
+              <option value="cash">Cash Contribution</option>
+            </select>
+          </div>
         </div>
-        <Input
-          className="mt-2 h-11 rounded-xl"
-          type="number"
-          placeholder="Or enter custom amount"
-          value={amount}
-          onChange={e => setAmount(e.target.value)}
-          required
-          min={1}
-        />
-      </div>
 
-      {/* Personal info */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-2">
-          <Label>Full Name *</Label>
-          <Input className="h-11 rounded-xl" value={form.fullName} onChange={e => set("fullName", e.target.value)} required />
-        </div>
-        <div className="grid gap-2">
-          <Label>Email *</Label>
-          <Input type="email" className="h-11 rounded-xl" value={form.email} onChange={e => set("email", e.target.value)} required />
-        </div>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-2">
-          <Label>Phone Number *</Label>
-          <Input className="h-11 rounded-xl" value={form.phone} onChange={e => set("phone", e.target.value)} required />
-        </div>
-        <div className="grid gap-2">
-          <Label>Payment Method *</Label>
-          <select
-            className="h-11 rounded-xl border border-input bg-transparent px-3 text-sm"
-            value={form.paymentMethod}
-            onChange={e => set("paymentMethod", e.target.value)}
-          >
-            <option value="upi">UPI</option>
-            <option value="bank">Bank Transfer</option>
-            <option value="cash">Cash</option>
-          </select>
-        </div>
-      </div>
-      <div className="grid gap-2">
-        <Label>Transaction ID / Reference</Label>
-        <Input className="h-11 rounded-xl" placeholder="UPI Ref / UTR Number" value={form.transactionId} onChange={e => set("transactionId", e.target.value)} />
-      </div>
-      <div className="grid gap-2">
-        <Label>Payment Screenshot (Optional)</Label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={e => setFile(e.target.files[0])}
-          className="block w-full cursor-pointer rounded-xl border border-dashed border-border/70 bg-secondary/40 px-4 py-3 text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1 file:text-xs file:font-semibold file:text-accent-foreground"
-        />
-      </div>
-      <div className="grid gap-2">
-        <Label>Donation Purpose</Label>
-        <Textarea
-          className="min-h-20 rounded-xl"
-          placeholder="e.g. Education fund, General donation..."
-          value={form.purpose}
-          onChange={e => set("purpose", e.target.value)}
-        />
-      </div>
-      <Button
-        type="submit"
-        disabled={loading}
-        className="h-12 rounded-xl bg-accent text-base font-bold text-accent-foreground shadow-sm shadow-accent/25 hover:bg-accent/90"
-      >
-        {loading ? "Submitting…" : (
-          <><Heart className="mr-2 size-5" /> Submit Donation</>
+        {form.paymentMethod !== "online" && (
+          <>
+            <div className="grid gap-2">
+              <Label>Transaction ID / Reference (UTR) *</Label>
+              <Input
+                className="h-11 rounded-xl"
+                placeholder="Enter 12-digit UPI Ref / UTR Number"
+                value={form.transactionId}
+                onChange={e => set("transactionId", e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Payment Screenshot (Optional)</Label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => setFile(e.target.files[0])}
+                className="block w-full cursor-pointer rounded-xl border border-dashed border-border/70 bg-secondary/40 px-4 py-3 text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1 file:text-xs file:font-semibold file:text-accent-foreground"
+              />
+            </div>
+          </>
         )}
-      </Button>
-      <p className="text-center text-xs text-muted-foreground">
-        Our team will verify your donation within 24 hours. You'll receive a confirmation email.
-      </p>
-    </form>
+
+        <div className="grid gap-2">
+          <Label>Donation Purpose</Label>
+          <Textarea
+            className="min-h-20 rounded-xl"
+            placeholder="e.g. Education fund, General donation..."
+            value={form.purpose}
+            onChange={e => set("purpose", e.target.value)}
+          />
+        </div>
+        <Button
+          type="submit"
+          disabled={loading}
+          className="h-12 rounded-xl bg-accent text-base font-bold text-accent-foreground shadow-sm shadow-accent/25 hover:bg-accent/90"
+        >
+          {loading ? "Processing…" : form.paymentMethod === "online" ? (
+            <><Heart className="mr-2 size-5 fill-current" /> Pay Instant via Razorpay (₹{amount || "0"})</>
+          ) : (
+            <><Heart className="mr-2 size-5" /> Submit Offline Donation</>
+          )}
+        </Button>
+        <p className="text-center text-xs text-muted-foreground">
+          {form.paymentMethod === "online"
+            ? "Instant 80G tax receipt will be sent directly to your email."
+            : "Our team will verify your offline donation within 24 hours and email your receipt."}
+        </p>
+      </form>
+    </>
   )
 }
 

@@ -6,8 +6,36 @@ import { Reveal } from "@/components/shared/reveal"
 import { formatINR } from "@/components/shared/campaign-card"
 import { MOCK_CAMPAIGNS } from "@/lib/mock-data"
 
-export function FeaturedCampaign() {
-  const campaign = MOCK_CAMPAIGNS[0]
+async function getFeaturedCampaign() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"}/crowdfunding`, {
+      cache: 'no-store'
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.campaigns && data.campaigns.length > 0) {
+        // Find the first active campaign
+        const activeCampaign = data.campaigns.find(c => c.status === "active") || data.campaigns[0];
+        return {
+          id: activeCampaign._id,
+          title: activeCampaign.title,
+          description: activeCampaign.description,
+          image: activeCampaign.image?.url || "/smiling-school-children-india-education.png",
+          targetAmount: activeCampaign.targetAmount,
+          raisedAmount: activeCampaign.raisedAmount || 0,
+        };
+      }
+    }
+  } catch (error) {
+    console.error("Failed to fetch campaign:", error);
+  }
+  // Fallback to mock data if API fails or no campaign exists
+  return MOCK_CAMPAIGNS[0];
+}
+
+export async function FeaturedCampaign() {
+  const campaign = await getFeaturedCampaign()
   const pct = Math.min(Math.round((campaign.raisedAmount / campaign.targetAmount) * 100), 100)
 
   return (
@@ -44,7 +72,7 @@ export function FeaturedCampaign() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90">
-                <Link href="/donate">
+                <Link href={`/donate?campaign=${campaign.title || 'featured'}`}>
                   <Heart className="mr-2 size-5" />
                   Donate to this Cause
                 </Link>

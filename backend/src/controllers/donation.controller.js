@@ -13,7 +13,7 @@ const { generateReceiptPDF } = require("../utils/generatePDF");
 
 // Initialize Razorpay
 const razorpayInstance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_mockkeyid",
+    key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_TMqxkUch9orx96",
     key_secret: process.env.RAZORPAY_KEY_SECRET || "mockkeysecret",
 });
 
@@ -34,10 +34,10 @@ exports.createOrder = async (req, res) => {
     try {
         const { amount, paymentMethod, message, fullName, email, phone, purpose, upiId, projectId, campaignId } = req.body;
 
-        // Optionally link to member if logged in
+        let userId = req.user ? req.user.id : null;
         let memberId = null;
-        if (req.user && req.user.id) {
-            const member = await Member.findOne({ user: req.user.id });
+        if (userId) {
+            const member = await Member.findOne({ user: userId });
             if (member) memberId = member._id;
         }
 
@@ -54,6 +54,7 @@ exports.createOrder = async (req, res) => {
         }
 
         const donation = await Donation.create({
+            user: userId,
             member: memberId,
             fullName,
             email,
@@ -119,7 +120,7 @@ exports.verifyPayment = async (req, res) => {
             // Generate PDF Receipt
             const donorName = donation.fullName || (donation.member && donation.member.user && donation.member.user.fullName) || "Donor";
             const donorEmail = donation.email || (donation.member && donation.member.user && donation.member.user.email) || "";
-            
+
             const pdfPath = await generateReceiptPDF(donation, donorName, donorEmail);
 
             const mailOptions = {
@@ -165,12 +166,24 @@ exports.getAllDonations = async (req, res) => {
 
 exports.getMyDonations = async (req, res) => {
     try {
-        const member = await Member.findOne({ user: req.user.id });
-        if (!member) {
-            return res.status(404).json({ success: false, message: "Member not found" });
+        const userId = req.user.id;
+        const User = require("../models/User");
+        const userObj = await User.findById(userId);
+        const member = await Member.findOne({ user: userId });
+
+        const queryOr = [{ user: userId }];
+        if (userObj && userObj.email) {
+            queryOr.push({ email: userObj.email });
+        }
+        if (member) {
+            queryOr.push({ member: member._id });
         }
 
-        const donations = await Donation.find({ member: member._id }).populate("project", "title").populate("campaign", "title").sort("-createdAt");
+        const donations = await Donation.find({ $or: queryOr })
+            .populate("project", "title")
+            .populate("campaign", "title")
+            .sort("-createdAt");
+
         res.status(200).json({ success: true, count: donations.length, donations });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -180,10 +193,11 @@ exports.getMyDonations = async (req, res) => {
 exports.createManualDonation = async (req, res) => {
     try {
         const { amount, paymentMethod, transactionId, message, fullName, email, phone, purpose, upiId, projectId, campaignId } = req.body;
-        
+
+        let userId = req.user ? req.user.id : null;
         let memberId = null;
-        if (req.user && req.user.id) {
-            const member = await Member.findOne({ user: req.user.id });
+        if (userId) {
+            const member = await Member.findOne({ user: userId });
             if (member) memberId = member._id;
         }
 
@@ -196,6 +210,7 @@ exports.createManualDonation = async (req, res) => {
         }
 
         const donation = await Donation.create({
+            user: userId,
             member: memberId,
             fullName,
             email,
@@ -250,7 +265,7 @@ exports.verifyManualDonation = async (req, res) => {
 
             const donorName = donation.fullName || (donation.member && donation.member.user && donation.member.user.fullName) || "Donor";
             const donorEmail = donation.email || (donation.member && donation.member.user && donation.member.user.email) || "";
-            
+
             const pdfPath = await generateReceiptPDF(donation, donorName, donorEmail);
 
             const mailOptions = {

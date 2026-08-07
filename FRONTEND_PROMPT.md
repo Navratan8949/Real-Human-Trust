@@ -10,7 +10,7 @@ Fonts: Outfit + Playfair Display (Google Fonts)
 ---
 
 ## BACKEND API (Already Built)
-Base URL: http://localhost:8000/api/v1
+Base URL: https://real-human-trust.onrender.com/api/v1
 Auth: JWT Bearer Token in Authorization header
 Content-Type: application/json (or multipart/form-data for file uploads)
 

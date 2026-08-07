@@ -1,61 +1,103 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowRight, Heart, Users, MapPin, ShieldCheck, HandHeart } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowRight, Heart, Users, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
-    },
+const slides = [
+  {
+    image: "/hero-community-education-india.png",
+    title: "Empowering lives,",
+    highlight: "shaping futures.",
+    desc: "Real Human Trust is dedicated to uplifting underprivileged communities through quality education, accessible healthcare, and sustainable empowerment programs across India."
   },
-}
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 70, damping: 15 } },
-}
+  {
+    image: "/community-health-camp-india.png",
+    title: "Compassionate care,",
+    highlight: "for everyone.",
+    desc: "Providing essential medical camps, life-saving healthcare access, and nutritional support to those who need it the most in rural and urban areas."
+  },
+  {
+    image: "/women-skill-training-workshop-india.png",
+    title: "Building skills,",
+    highlight: "creating leaders.",
+    desc: "Empowering women and youth through vocational training, financial literacy, and entrepreneurship programs to build self-reliant futures."
+  },
+  {
+    image: "/about-volunteers-india.png",
+    title: "Together we can,",
+    highlight: "make a difference.",
+    desc: "Join thousands of dedicated volunteers and supporters in our mission to bring hope, dignity, and opportunity to marginalized communities."
+  }
+]
 
 export function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 6000)
+    return () => clearInterval(timer)
+  }, [])
+
   return (
-    <section className="relative flex min-h-[90vh] items-center overflow-hidden bg-[#0a1628] text-white pt-24 pb-16 lg:pt-32 lg:pb-24">
-      {/* Background Glow */}
-      <div className="absolute left-1/2 top-1/2 -z-10 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/5 blur-[120px]" />
-      
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-          
-          {/* ── LEFT: TEXT CONTENT ── */}
+    <section className="relative flex min-h-[75vh] md:min-h-[85vh] items-center justify-center overflow-hidden bg-black text-white pt-20 pb-16">
+      {/* Background Slider */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={currentSlide}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.5, ease: "easeInOut" }}
+          className="absolute inset-0 z-0"
+        >
+          <Image
+            src={slides[currentSlide].image}
+            alt="Hero Background"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+          {/* Centralized Overlay to ensure text readability */}
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-navy/80" />
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="relative z-10 mx-auto w-full max-w-5xl px-4 flex flex-col items-center text-center mt-[-2rem]">
+        <AnimatePresence mode="wait">
           <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="flex flex-col justify-center max-w-2xl"
+            key={`content-${currentSlide}`}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col items-center max-w-4xl"
           >
-            <motion.div variants={itemVariants} className="inline-flex items-center gap-2 self-start rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-300 backdrop-blur-sm">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-300 backdrop-blur-md mb-8">
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-lime-400 opacity-75"></span>
                 <span className="relative inline-flex size-2 rounded-full bg-lime-500"></span>
               </span>
               Est. 2016 · Rajkot, Gujarat
-            </motion.div>
+            </div>
 
-            <motion.h1 variants={itemVariants} className="mt-8 font-serif text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-[4rem]">
-              Empowering lives, <br />
-              <span className="text-accent italic">shaping futures.</span>
-            </motion.h1>
+            <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-[5rem] drop-shadow-xl text-white">
+              {slides[currentSlide].title} <br />
+              <span className="text-accent italic">{slides[currentSlide].highlight}</span>
+            </h1>
 
-            <motion.p variants={itemVariants} className="mt-6 text-lg leading-relaxed text-white/70">
-              Real Human Trust is dedicated to uplifting underprivileged communities through quality education, accessible healthcare, and sustainable empowerment programs across India.
-            </motion.p>
+            <p className="mt-8 text-lg sm:text-xl leading-relaxed text-white/90 drop-shadow-md max-w-2xl">
+              {slides[currentSlide].desc}
+            </p>
 
-            <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Button
                 asChild
                 size="lg"
@@ -70,103 +112,54 @@ export function Hero() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="h-14 rounded-full border-white/20 bg-transparent px-8 text-base text-white transition-all hover:-translate-y-1 hover:bg-white/10"
+                className="h-14 rounded-full border-white/30 bg-black/30 backdrop-blur-sm px-8 text-base text-white transition-all hover:-translate-y-1 hover:bg-white/20"
               >
                 <Link href="/signup">
                   Become a Member
                   <ArrowRight className="ml-2 size-5" />
                 </Link>
               </Button>
-            </motion.div>
+            </div>
 
-            {/* Quick Stats row */}
-            <motion.div variants={itemVariants} className="mt-12 flex items-center gap-8 border-t border-white/10 pt-8">
+            {/* Quick Stats row - Centered */}
+            <div className="mt-12 flex flex-wrap justify-center items-center gap-8 border-t border-white/20 pt-8 max-w-xl">
               <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-white/5">
+                <div className="flex size-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
                   <Users className="size-5 text-accent" />
                 </div>
-                <div>
-                  <p className="font-bold text-white">25,000+</p>
-                  <p className="text-xs text-white/60">Lives Impacted</p>
+                <div className="text-left">
+                  <p className="font-bold text-white drop-shadow-md">25,000+</p>
+                  <p className="text-xs text-white/80 drop-shadow-md">Lives Impacted</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-white/5">
+                <div className="flex size-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
                   <ShieldCheck className="size-5 text-lime-400" />
                 </div>
-                <div>
-                  <p className="font-bold text-white">80G & 12A</p>
-                  <p className="text-xs text-white/60">Govt. Certified</p>
+                <div className="text-left">
+                  <p className="font-bold text-white drop-shadow-md">80G & 12A</p>
+                  <p className="text-xs text-white/80 drop-shadow-md">Govt. Certified</p>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
-
-          {/* ── RIGHT: BENTO GRID (Animated) ── */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid h-[500px] sm:h-[600px] grid-cols-2 grid-rows-3 gap-4 lg:ml-auto w-full max-w-lg"
-          >
-            {/* Main Tall Image */}
-            <motion.div
-              variants={itemVariants}
-              className="group relative row-span-3 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5"
-            >
-              <Image
-                src="/hero-community-education-india.png"
-                alt="Education"
-                fill
-                priority
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 1024px) 50vw, 300px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-transparent to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5">
-                <p className="text-sm font-bold text-white">Education for All</p>
-                <p className="text-xs text-white/70">Building strong foundations</p>
-              </div>
-            </motion.div>
-
-            {/* Top Right: Stat/Focus Card */}
-            <motion.div
-              variants={itemVariants}
-              className="group relative flex flex-col justify-center overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-accent/20 to-accent/5 p-6"
-            >
-              <HandHeart className="size-8 text-accent mb-4" />
-              <h3 className="font-serif text-2xl font-bold text-white">Healthcare</h3>
-              <p className="text-xs text-white/70 mt-1">Medical camps & support</p>
-              
-              {/* Decorative circle */}
-              <div className="absolute -right-6 -top-6 size-24 rounded-full bg-accent/20 blur-xl transition-all group-hover:bg-accent/30" />
-            </motion.div>
-
-            {/* Bottom Right: Second Image */}
-            <motion.div
-              variants={itemVariants}
-              className="group relative row-span-2 overflow-hidden rounded-[2rem] border border-white/10 bg-white/5"
-            >
-              <Image
-                src="/community-health-camp-india.png"
-                alt="Healthcare"
-                fill
-                priority
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 1024px) 50vw, 300px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-transparent to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5">
-                <p className="text-sm font-bold text-white">Community Relief</p>
-                <p className="text-xs text-white/70">Standing together</p>
-              </div>
-            </motion.div>
-
-          </motion.div>
-
-        </div>
+        </AnimatePresence>
       </div>
-      
+
+      {/* Slider Indicators */}
+      <div className="absolute bottom-12 sm:bottom-16 left-1/2 flex -translate-x-1/2 gap-3 z-20">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`h-2 rounded-full transition-all duration-500 ${
+              currentSlide === index ? "w-10 bg-accent" : "w-3 bg-white/40 hover:bg-white/70"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+
       {/* Bottom Wave Divider */}
       <div className="absolute inset-x-0 bottom-[-2px] z-30 w-[calc(100%+4px)] -ml-[2px] leading-[0] pointer-events-none">
         <svg

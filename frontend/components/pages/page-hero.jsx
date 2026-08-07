@@ -3,7 +3,7 @@ export function PageHero({ eyebrow, title, description, image }) {
   return (
     <section className="relative isolate overflow-hidden border-b border-border/50">
       {image && (<>
-        <div className="absolute inset-0 -z-10"><Image src={image} alt="" fill className="object-cover" sizes="100vw" priority /></div>
+        <div className="absolute inset-0 -z-10"><Image src={image} alt="" fill className="object-cover" sizes="100vw" priority loading="eager" /></div>
         <div className="absolute inset-0 -z-10 bg-navy/75 backdrop-blur-[2px]" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-navy/40 via-navy/70 to-[#0a1628]" />
       </>)}
