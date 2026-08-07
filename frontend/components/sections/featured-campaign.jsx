@@ -8,7 +8,7 @@ import { MOCK_CAMPAIGNS } from "@/lib/mock-data"
 
 async function getFeaturedCampaign() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"}/crowdfunding`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/crowdfunding`, {
       cache: 'no-store'
     });
 

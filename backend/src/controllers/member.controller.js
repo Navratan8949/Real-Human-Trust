@@ -95,7 +95,7 @@ exports.approveMember = async (req, res) => {
         member.membershipStatus = "approved";
 
         // Generate QR Code containing member verification link
-        const verificationLink = `${process.env.FRONTEND_URL || "https://real-human-trust-nu.vercel.app"}/verify-member/${member.memberId}`;
+        const verificationLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-member/${member.memberId}`;
         const qrCodeData = await QRCode.toDataURL(verificationLink);
 
         member.qrCode = qrCodeData;
@@ -213,7 +213,7 @@ exports.createMemberDirectly = async (req, res) => {
         });
 
         // 4. Generate QR Code
-        const verificationLink = `${process.env.FRONTEND_URL || "https://real-human-trust-nu.vercel.app"}/verify-member/${member.memberId}`;
+        const verificationLink = `${process.env.FRONTEND_URL || "http://localhost:3000"}/verify-member/${member.memberId}`;
         member.qrCode = await QRCode.toDataURL(verificationLink);
         await member.save();
 

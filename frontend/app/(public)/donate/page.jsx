@@ -95,7 +95,7 @@ function ManualDonationFormInner() {
   async function handleRazorpayPayment() {
     setLoading(true)
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://locahost:8000/api/v1"
       const res = await fetch(`${apiBase}/donations/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,7 +111,7 @@ function ManualDonationFormInner() {
       }
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_TMqxkUch9orx96",
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
         name: "Real Human Education & Charitable Trust",
@@ -169,7 +169,7 @@ function ManualDonationFormInner() {
       if (projectId) fd.append("projectId", projectId)
       if (campaignId) fd.append("campaignId", campaignId)
       if (file) fd.append("paymentProof", file)
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"}/donations/manual`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/donations/manual`, {
         method: "POST", body: fd,
       })
       const data = await res.json()

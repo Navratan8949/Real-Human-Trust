@@ -79,7 +79,7 @@ exports.createAppointmentLetter = async (req, res) => {
         // 2. Save to database when PDF is completely written
         writeStream.on("finish", async () => {
             try {
-                const pdfUrl = `https://real-human-trust.onrender.com/public/uploads/appointments/${pdfFileName}`;
+                const pdfUrl = `${process.env.FRONTEND_URL}/public/uploads/appointments/${pdfFileName}`;
 
                 const appointmentLetter = await AppointmentLetter.create({
                     member: memberId,

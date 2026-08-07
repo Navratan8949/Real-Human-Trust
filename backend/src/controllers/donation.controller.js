@@ -13,8 +13,8 @@ const { generateReceiptPDF } = require("../utils/generatePDF");
 
 // Initialize Razorpay
 const razorpayInstance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_TMqxkUch9orx96",
-    key_secret: process.env.RAZORPAY_KEY_SECRET || "mockkeysecret",
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
 // Configure Nodemailer
