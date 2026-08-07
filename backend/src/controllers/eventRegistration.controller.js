@@ -1,6 +1,7 @@
 const EventRegistration = require("../models/EventRegistration");
 const Event = require("../models/Event");
 const Member = require("../models/Member");
+const { SendVerificationCode } = require("../utils/sendMail");
 
 exports.registerForEvent = async (req, res) => {
     try {
@@ -52,6 +53,18 @@ exports.registerForEvent = async (req, res) => {
             remarks,
             status: "registered"
         });
+
+        // Send Email Notification
+        try {
+            await SendVerificationCode(
+                email.toLowerCase(),
+                `<p>Dear ${fullName},</p><p>Your registration for the event "<strong>${event.title}</strong>" has been confirmed.</p><p><strong>Date:</strong> ${event.eventDate ? new Date(event.eventDate).toDateString() : "TBA"}<br/><strong>Location:</strong> ${event.location || "TBA"}</p><p>We look forward to seeing you there!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
+                "Event Registration Confirmed - Real Human Trust",
+                `Dear ${fullName},\n\nYour registration for the event "${event.title}" has been confirmed.\n\nDate: ${event.eventDate ? new Date(event.eventDate).toDateString() : "TBA"}\nLocation: ${event.location || "TBA"}\n\nWe look forward to seeing you there!\n\nBest Regards,\nReal Human Trust Team`
+            );
+        } catch (emailError) {
+            console.error("Error sending event registration email:", emailError);
+        }
 
         res.status(201).json({ success: true, message: "Registered successfully", registration });
     } catch (error) {

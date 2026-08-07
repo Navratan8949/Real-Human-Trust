@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, CheckCircle2, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getProjectById } from "@/service/project.service"
+import { CampaignCard } from "@/components/shared/campaign-card"
 
 export async function generateMetadata({ params }) {
   const { id } = await params
@@ -19,10 +20,20 @@ export default async function ProjectDetailPage({ params }) {
   const { id } = await params
   
   let project = null
+  let campaigns = []
   try {
     const data = await getProjectById(id)
     if (data?.success) {
       project = data.project || data.data
+    }
+    
+    // Fetch associated campaigns
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/crowdfunding`, { cache: 'no-store' })
+    if (res.ok) {
+      const cData = await res.json()
+      if (cData.success && cData.campaigns) {
+        campaigns = cData.campaigns.filter(c => c.project?._id === id || c.project === id)
+      }
     }
   } catch (error) {
     console.error("Failed to fetch project details:", error)
@@ -78,6 +89,17 @@ export default async function ProjectDetailPage({ params }) {
               ))}
             </ul>
           </div>
+          
+          {campaigns.length > 0 && (
+            <div className="mt-12 pt-10 border-t border-border/60">
+              <h3 className="font-serif text-2xl font-semibold text-navy mb-6">Active Campaigns for this Project</h3>
+              <div className="grid gap-6 sm:grid-cols-2">
+                {campaigns.map(campaign => (
+                  <CampaignCard key={campaign._id} campaign={campaign} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         
         <div>

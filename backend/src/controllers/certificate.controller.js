@@ -1,6 +1,7 @@
 const Certificate = require("../models/Certificate");
 const Member = require("../models/Member");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { SendVerificationCode } = require("../utils/sendMail");
 
 exports.createCertificate = async (req, res) => {
     try {
@@ -35,6 +36,22 @@ exports.createCertificate = async (req, res) => {
             path: "member",
             populate: { path: "user", select: "fullName email" }
         });
+
+        // Send Email Notification
+        if (populatedCertificate.member && populatedCertificate.member.user && populatedCertificate.member.user.email) {
+            const userEmail = populatedCertificate.member.user.email;
+            const userName = populatedCertificate.member.user.fullName;
+            try {
+                await SendVerificationCode(
+                    userEmail,
+                    `<p>Dear ${userName},</p><p>We are delighted to inform you that you have been awarded a new certificate: "<strong>${title}</strong>".</p><p>Description: ${description}</p><p>You can view and download your certificate from your Member Dashboard.</p><p>Thank you for your continuous support!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
+                    "Congratulations! You have received a new Certificate - Real Human Trust",
+                    `Dear ${userName},\n\nWe are delighted to inform you that you have been awarded a new certificate: "${title}".\n\nDescription: ${description}\n\nYou can view and download your certificate from your Member Dashboard.\n\nThank you for your continuous support!\n\nBest Regards,\nReal Human Trust Team`
+                );
+            } catch (emailError) {
+                console.error("Error sending certificate email:", emailError);
+            }
+        }
 
         res.status(201).json({ success: true, certificate: populatedCertificate });
     } catch (error) {

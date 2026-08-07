@@ -7,6 +7,7 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, CalendarDays, MapPin, Users, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { registerForEvent } from "@/service/event-registration.service"
+import { getEventById } from "@/service/event.service"
 
 export default function EventDetailPage({ params }) {
   const resolvedParams = use(params)
@@ -17,8 +18,10 @@ export default function EventDetailPage({ params }) {
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const { data } = await api.get(`/events/${id}`)
-        setEvent(data.event)
+        const data = await getEventById(id)
+        if (data?.success) {
+          setEvent(data.event || data.data)
+        }
       } catch (err) {
         console.error("Failed to load event", err)
       } finally {

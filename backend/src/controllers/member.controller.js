@@ -2,6 +2,7 @@ const Member = require("../models/Member");
 const User = require("../models/User");
 const QRCode = require("qrcode");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { SendVerificationCode } = require("../utils/sendMail");
 
 const generateMemberId = () => {
     return "RHTM" + Math.floor(100000 + Math.random() * 900000);
@@ -86,7 +87,7 @@ exports.getAllMembers = async (req, res) => {
 
 exports.approveMember = async (req, res) => {
     try {
-        const member = await Member.findById(req.params.id);
+        const member = await Member.findById(req.params.id).populate("user", "fullName email");
         if (!member) {
             return res.status(404).json({ success: false, message: "Member not found" });
         }
@@ -101,6 +102,22 @@ exports.approveMember = async (req, res) => {
 
         await member.save();
 
+        // Send Email Notification
+        if (member.user && member.user.email) {
+            const userEmail = member.user.email;
+            const userName = member.user.fullName;
+            try {
+                await SendVerificationCode(
+                    userEmail,
+                    `<p>Dear ${userName},</p><p>Congratulations! Your membership application has been approved.</p><p>Your unique Member ID is: <strong>${member.memberId}</strong></p><p>You can now log in to the Member Dashboard to access your profile, ID card, and exclusive features.</p><p>Welcome to the team!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
+                    "Membership Approved - Real Human Trust",
+                    `Dear ${userName},\n\nCongratulations! Your membership application has been approved.\nYour unique Member ID is: ${member.memberId}\n\nYou can now log in to the Member Dashboard to access your profile, ID card, and exclusive features.\n\nWelcome to the team!\n\nBest Regards,\nReal Human Trust Team`
+                );
+            } catch (emailError) {
+                console.error("Error sending approval email:", emailError);
+            }
+        }
+
         res.status(200).json({ success: true, message: "Member approved and QR Code generated", member });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -110,7 +127,7 @@ exports.approveMember = async (req, res) => {
 exports.rejectMember = async (req, res) => {
     try {
         const { reason } = req.body;
-        const member = await Member.findById(req.params.id);
+        const member = await Member.findById(req.params.id).populate("user", "fullName email");
         if (!member) {
             return res.status(404).json({ success: false, message: "Member not found" });
         }
@@ -118,6 +135,22 @@ exports.rejectMember = async (req, res) => {
         member.membershipStatus = "rejected";
         member.rejectionReason = reason || "No reason provided by administration.";
         await member.save();
+
+        // Send Email Notification
+        if (member.user && member.user.email) {
+            const userEmail = member.user.email;
+            const userName = member.user.fullName;
+            try {
+                await SendVerificationCode(
+                    userEmail,
+                    `<p>Dear ${userName},</p><p>We regret to inform you that your membership application has been rejected at this time.</p><p><strong>Reason provided by administration:</strong><br/>${reason || "No reason provided by administration."}</p><p>If you have any questions, please contact our support team.</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
+                    "Membership Application Status - Real Human Trust",
+                    `Dear ${userName},\n\nWe regret to inform you that your membership application has been rejected at this time.\n\nReason provided by administration:\n${reason || "No reason provided by administration."}\n\nIf you have any questions, please contact our support team.\n\nBest Regards,\nReal Human Trust Team`
+                );
+            } catch (emailError) {
+                console.error("Error sending rejection email:", emailError);
+            }
+        }
 
         res.status(200).json({ success: true, message: "Member application rejected", member });
     } catch (error) {
@@ -185,6 +218,24 @@ exports.createMemberDirectly = async (req, res) => {
         await member.save();
 
         const populatedMember = await Member.findById(member._id).populate("user", "fullName email mobile role");
+
+        // Send Email Notification
+        if (populatedMember.user && populatedMember.user.email) {
+            const userEmail = populatedMember.user.email;
+            const userName = populatedMember.user.fullName;
+            const loginInfo = !password ? "" : `\nYour account has been created with this email. Password: ${password}\n`;
+            const loginInfoHtml = !password ? "" : `<p>Your account has been created with this email. Password: <strong>${password}</strong></p>`;
+            try {
+                await SendVerificationCode(
+                    userEmail,
+                    `<p>Dear ${userName},</p><p>Your membership has been successfully created by the administration.</p><p>Your unique Member ID is: <strong>${member.memberId}</strong></p>${loginInfoHtml}<p>You can log in to the Member Dashboard to access your profile, ID card, and exclusive features.</p><p>Welcome to the team!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
+                    "Welcome to Real Human Trust - Membership Created",
+                    `Dear ${userName},\n\nYour membership has been successfully created by the administration.\nYour unique Member ID is: ${member.memberId}\n${loginInfo}\nYou can log in to the Member Dashboard to access your profile, ID card, and exclusive features.\n\nWelcome to the team!\n\nBest Regards,\nReal Human Trust Team`
+                );
+            } catch (emailError) {
+                console.error("Error sending creation email:", emailError);
+            }
+        }
 
         res.status(201).json({ success: true, message: "Member created and approved successfully", data: populatedMember });
     } catch (err) {

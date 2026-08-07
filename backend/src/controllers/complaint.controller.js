@@ -1,5 +1,6 @@
 const Complaint = require("../models/Complaint");
 const Member = require("../models/Member");
+const { SendVerificationCode } = require("../utils/sendMail");
 
 exports.raiseComplaint = async (req, res) => {
     try {
@@ -67,7 +68,10 @@ exports.getComplaintById = async (req, res) => {
 exports.resolveComplaint = async (req, res) => {
     try {
         const { status, reply } = req.body;
-        const complaint = await Complaint.findById(req.params.id);
+        const complaint = await Complaint.findById(req.params.id).populate({
+            path: "member",
+            populate: { path: "user", select: "fullName email" }
+        });
 
         if (!complaint) return res.status(404).json({ success: false, message: "Complaint not found" });
 
@@ -80,6 +84,23 @@ exports.resolveComplaint = async (req, res) => {
         }
 
         await complaint.save();
+
+        // Send Email Notification
+        if ((status === "resolved" || status === "closed") && complaint.member && complaint.member.user && complaint.member.user.email) {
+            const userEmail = complaint.member.user.email;
+            const userName = complaint.member.user.fullName;
+            try {
+                await SendVerificationCode(
+                    userEmail,
+                    `<p>Dear ${userName},</p><p>Your complaint regarding "<strong>${complaint.subject}</strong>" has been updated to "<strong>${status}</strong>".</p><p><strong>Admin Reply:</strong><br/>${reply || "No additional remarks."}</p><p>If you have any further issues, please reach out to us.</p><p>Best Regards,<br/>Real Human Trust Support Team</p>`,
+                    `Update on your Complaint: ${complaint.subject} - Real Human Trust`,
+                    `Dear ${userName},\n\nYour complaint regarding "${complaint.subject}" has been updated to "${status}".\n\nAdmin Reply:\n${reply || "No additional remarks."}\n\nIf you have any further issues, please reach out to us.\n\nBest Regards,\nReal Human Trust Support Team`
+                );
+            } catch (emailError) {
+                console.error("Error sending complaint email:", emailError);
+            }
+        }
+
         res.status(200).json({ success: true, message: "Complaint updated successfully", complaint });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
