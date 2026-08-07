@@ -61,7 +61,7 @@ export function LatestUpdates() {
 
   return (
     <section className="border-y border-border/60 bg-gradient-to-b from-card via-background to-card py-12 md:py-16">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 lg:grid-cols-12">
+      <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 lg:grid-cols-12 lg:gap-10">
         
         {/* Left Column: Latest News & Updates (Col 7) */}
         <div className="lg:col-span-7 flex flex-col justify-between">
@@ -97,7 +97,7 @@ export function LatestUpdates() {
                       <span className="inline-flex items-center gap-1.5 rounded-md bg-accent/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                         {item.category?.replace("_", " ") || "NEWS"}
                       </span>
-                      <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1">
+                      <span className="text-[11px] font-medium text-muted-foreground flex items-center gap-1 shrink-0">
                         <Clock className="size-3" />
                         {new Date(item.createdAt || Date.now()).toLocaleDateString("en-IN", { month: "short", day: "numeric" })}
                       </span>
