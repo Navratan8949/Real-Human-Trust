@@ -99,7 +99,10 @@ exports.applyMembership = async (req, res) => {
 
 exports.getAllMembers = async (req, res) => {
     try {
-        const members = await Member.find().populate("user", "fullName email mobile role").sort("-createdAt");
+        const members = await Member.find()
+            .populate("user", "fullName email mobile role profileImage")
+            .populate("referredBy", "fullName email profileImage")
+            .sort("-createdAt");
         res.status(200).json({ success: true, count: members.length, members });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

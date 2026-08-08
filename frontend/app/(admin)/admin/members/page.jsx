@@ -14,24 +14,26 @@ const memberSchema = [
   { name: "email", label: "Email Address", type: "email", required: true },
   { name: "mobile", label: "Mobile Number", type: "text", required: true },
   { name: "password", label: "Set User Password", type: "text", required: true, placeholder: "Create a password for this user" },
-  { 
-    name: "membershipType", 
-    label: "Membership Type", 
-    type: "select", 
+  {
+    name: "membershipType",
+    label: "Membership Type",
+    type: "select",
     required: true,
     options: [
       { label: "General", value: "general" },
       { label: "Lifetime", value: "lifetime" },
       { label: "Honorary", value: "honorary" },
       { label: "Student", value: "student" }
-    ] 
+    ]
   },
-  { name: "bloodGroup", label: "Blood Group", type: "select", options: [
+  {
+    name: "bloodGroup", label: "Blood Group", type: "select", options: [
       { label: "A+", value: "A+" }, { label: "A-", value: "A-" },
       { label: "B+", value: "B+" }, { label: "B-", value: "B-" },
       { label: "AB+", value: "AB+" }, { label: "AB-", value: "AB-" },
       { label: "O+", value: "O+" }, { label: "O-", value: "O-" }
-  ] },
+    ]
+  },
   { name: "occupation", label: "Occupation", type: "text" }
 ]
 
@@ -77,10 +79,31 @@ export default function Page() {
           { key: "name", label: "Name", render: (r) => r.user?.fullName || "N/A" },
           { key: "email", label: "Email", render: (r) => r.user?.email || "N/A" },
           { key: "type", label: "Type", render: (r) => <span className="capitalize">{r.membershipType}</span> },
+          {
+            key: "referredBy", label: "Referred By", render: (r) => {
+              if (!r.referredBy) return <span className="text-muted-foreground text-xs">-</span>
+              const refObj = typeof r.referredBy === "object" ? r.referredBy : null
+              const name = refObj?.fullName || refObj?.email || (typeof r.referredBy === "string" ? `ID: ${r.referredBy.slice(-6)}` : "Unknown")
+              const imgUrl = refObj?.profileImage?.url
+
+              return (
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100 text-slate-800 border border-slate-200 text-xs font-semibold">
+                  {imgUrl ? (
+                    <img src={imgUrl} alt={name} className="size-5 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <span className="size-5 rounded-full bg-emerald-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+                      {name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="truncate max-w-[120px]">{name}</span>
+                </div>
+              )
+            }
+          },
           { key: "status", label: "Status", render: (r) => <StatusBadge status={r.membershipStatus} /> },
-          { 
-            key: "actions", 
-            label: "Actions", 
+          {
+            key: "actions",
+            label: "Actions",
             render: (r) => (
               <Button size="sm" variant="outline" onClick={() => {
                 setSelectedMember(r);
@@ -89,7 +112,7 @@ export default function Page() {
               }} className="rounded-lg h-7 px-3 bg-navy/5 text-navy hover:bg-navy hover:text-white border-navy/20">
                 <Eye className="size-3.5 mr-1.5" /> View
               </Button>
-            ) 
+            )
           }
         ]}
       />
@@ -103,7 +126,7 @@ export default function Page() {
                 <XCircle className="size-5" />
               </button>
             </div>
-            
+
             <div className="p-6 overflow-y-auto">
               <div className="grid grid-cols-2 gap-y-4 gap-x-6">
                 <div><p className="text-[10px] font-bold uppercase text-slate-500">Full Name</p><p className="font-semibold text-slate-800">{selectedMember.user?.fullName}</p></div>
@@ -114,6 +137,28 @@ export default function Page() {
                 <div><p className="text-[10px] font-bold uppercase text-slate-500">Occupation</p><p className="font-semibold text-slate-800">{selectedMember.occupation || "N/A"}</p></div>
                 <div><p className="text-[10px] font-bold uppercase text-slate-500">Membership Type</p><p className="font-semibold text-slate-800 capitalize">{selectedMember.membershipType}</p></div>
                 <div><p className="text-[10px] font-bold uppercase text-slate-500">Status</p><StatusBadge status={selectedMember.membershipStatus} /></div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase text-slate-500 mb-1">Referred By</p>
+                  {selectedMember.referredBy ? (
+                    <div className="flex items-center gap-2">
+                      {(typeof selectedMember.referredBy === "object" && selectedMember.referredBy?.profileImage?.url) ? (
+                        <img src={selectedMember.referredBy.profileImage.url} alt="Referrer" className="size-7 rounded-full object-cover border border-slate-300" />
+                      ) : (
+                        <div className="size-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center border border-slate-300">
+                          {(typeof selectedMember.referredBy === "object" ? (selectedMember.referredBy?.fullName || selectedMember.referredBy?.email || "R") : "R").charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">
+                          {typeof selectedMember.referredBy === "object" ? (selectedMember.referredBy?.fullName || selectedMember.referredBy?.email) : `ID: ${selectedMember.referredBy}`}
+                        </p>
+                        {typeof selectedMember.referredBy === "object" && selectedMember.referredBy?.email && (
+                          <p className="text-[11px] text-slate-500">{selectedMember.referredBy.email}</p>
+                        )}
+                      </div>
+                    </div>
+                  ) : <p className="font-semibold text-slate-500 text-sm">None</p>}
+                </div>
                 {selectedMember.membershipStatus === 'rejected' && selectedMember.rejectionReason && (
                   <div className="col-span-2 mt-2 bg-rose-50 border border-rose-100 rounded-lg p-3">
                     <p className="text-[10px] font-bold uppercase text-rose-700 mb-1">Rejection Reason</p>
@@ -135,7 +180,7 @@ export default function Page() {
                   <p className="text-[10px] font-bold uppercase text-slate-500 mb-2">ID Proof</p>
                   {selectedMember.idProof?.url ? (
                     <a href={selectedMember.idProof.url} target="_blank" rel="noreferrer" className="block rounded-xl border border-border/60 overflow-hidden hover:opacity-80 transition-opacity">
-                      {selectedMember.idProof.url.endsWith('.pdf') ? 
+                      {selectedMember.idProof.url.endsWith('.pdf') ?
                         <div className="h-40 bg-slate-100 flex items-center justify-center font-bold text-slate-500">View PDF Proof</div>
                         : <img src={selectedMember.idProof.url} alt="ID Proof" className="w-full h-40 object-cover" />
                       }
@@ -153,8 +198,8 @@ export default function Page() {
                       <p className="text-sm font-bold text-rose-800 flex items-center gap-1.5 mb-2">
                         <AlertTriangle className="size-4" /> Why are you rejecting this application?
                       </p>
-                      <Textarea 
-                        placeholder="E.g., ID proof is not clear, please upload a valid Aadhar card." 
+                      <Textarea
+                        placeholder="E.g., ID proof is not clear, please upload a valid Aadhar card."
                         className="bg-white resize-none"
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
