@@ -3,8 +3,20 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, CheckCircle2, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getProjectById } from "@/service/project.service"
+import { getProjects, getProjectById } from "@/service/project.service"
 import { CampaignCard } from "@/components/shared/campaign-card"
+
+export async function generateStaticParams() {
+  try {
+    const data = await getProjects()
+    if (data && data.success && data.projects) {
+      return data.projects.map((p) => ({ id: p._id }))
+    }
+  } catch (error) {
+    console.error("Failed to fetch projects for static params", error)
+  }
+  return []
+}
 
 export async function generateMetadata({ params }) {
   const { id } = await params
@@ -15,8 +27,6 @@ export async function generateMetadata({ params }) {
     return { title: "Project" }
   }
 }
-
-export const dynamic = "force-dynamic"
 
 export default async function ProjectDetailPage({ params }) {
   const { id } = await params
