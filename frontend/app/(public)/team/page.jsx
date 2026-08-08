@@ -30,7 +30,7 @@ export default function Page() {
         image="/about-volunteers-india.png"
       />
 
-      <section className="bg-muted/10 py-20 md:py-32 min-h-[50vh]">
+      <section className="bg-muted/10 py-16 md:py-20 min-h-[50vh]">
         <div className="mx-auto max-w-7xl px-4">
 
           <div className="mb-16 max-w-2xl text-center mx-auto">

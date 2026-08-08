@@ -37,7 +37,7 @@ export function Testimonials() {
   }
 
   return (
-    <section className=" mx-auto max-w-7xl px-4 py-20 md:py-28 relative overflow-hidden">
+    <section className=" mx-auto max-w-7xl px-4 py-16 md:py-20 relative overflow-hidden">
 
       {/* Header Area with Top-Right Buttons */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

@@ -39,7 +39,7 @@ export async function FeaturedCampaign() {
   const pct = Math.min(Math.round((campaign.raisedAmount / campaign.targetAmount) * 100), 100)
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 md:py-28">
+    <section className="mx-auto max-w-7xl px-4 py-16 md:py-20">
       <Reveal>
         <div className="grid overflow-hidden rounded-lg bg-navy shadow-xl lg:grid-cols-2">
           <div className="relative min-h-64 lg:min-h-full">

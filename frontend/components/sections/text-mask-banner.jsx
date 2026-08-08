@@ -4,7 +4,7 @@ import { Reveal } from "@/components/shared/reveal"
 
 export function TextMaskBanner() {
   return (
-    <section className="relative flex min-h-[40vh] items-center justify-center overflow-hidden bg-[#040914] py-16">
+    <section className="relative flex min-h-[40vh] items-center justify-center overflow-hidden bg-[#040914] py-10">
       <Reveal>
         <div className="mx-auto w-full max-w-[100vw] px-4 text-center">
           {/* 

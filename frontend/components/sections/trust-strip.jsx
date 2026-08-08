@@ -15,7 +15,7 @@ const items = [
 export function TrustStrip() {
   return (
     <section className="relative border-y border-border/60 bg-card">
-      <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="mx-auto max-w-7xl px-4 py-4">
         <Reveal>
           <div className="flex flex-wrap items-center justify-center gap-3 md:justify-between">
             {items.map((item, i) => {

@@ -17,6 +17,7 @@ import { getProjectById } from "@/service/project.service"
 import { getCrowdfundingById } from "@/service/crowdfunding.service"
 import { QRCodeSVG } from "qrcode.react"
 import Script from "next/script"
+import { FaqSection } from "@/components/sections/faq-section"
 
 // Bank / UPI details
 const BANK = {
@@ -199,68 +200,74 @@ function ManualDonationFormInner() {
         )}
 
         {/* Quick amount selector */}
-        <div>
-          <Label className="mb-2 block text-sm font-semibold">Select Amount (₹) *</Label>
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+        <div className="rounded-2xl border border-border/40 bg-secondary/20 p-5">
+          <Label className="mb-3 block text-sm font-bold text-navy">Select Amount (₹) *</Label>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
             {QUICK_AMOUNTS.map(a => (
               <button key={a} type="button"
                 onClick={() => setAmount(String(a))}
-                className={`rounded-xl border py-2.5 text-sm font-bold transition ${amount === String(a)
-                  ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                  : "border-border/70 bg-card hover:border-accent/50 hover:bg-accent/8"}`}
+                className={`rounded-xl py-3 text-sm font-bold transition-all duration-200 ${amount === String(a)
+                  ? "bg-navy text-white shadow-md scale-[1.02]"
+                  : "bg-white border border-border/60 text-muted-foreground hover:border-navy/30 hover:text-navy"}`}
               >
                 ₹{a >= 1000 ? (a / 1000) + "K" : a}
               </button>
             ))}
           </div>
-          <Input
-            className="mt-2 h-11 rounded-xl"
-            type="number"
-            placeholder="Or enter custom amount"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            required
-            min={1}
-          />
+          <div className="relative mt-4">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">₹</span>
+            <Input
+              className="h-12 rounded-xl pl-8 border-border/60 bg-white font-semibold shadow-sm focus-visible:ring-navy"
+              type="number"
+              placeholder="Enter custom amount"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              required
+              min={1}
+            />
+          </div>
         </div>
 
         {/* Personal info */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2 mt-2">
           <div className="grid gap-2">
-            <Label>Full Name *</Label>
-            <Input className="h-11 rounded-xl" value={form.fullName} onChange={e => set("fullName", e.target.value)} required />
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Full Name *</Label>
+            <Input className="h-12 rounded-xl border-border/60 shadow-sm focus-visible:ring-navy font-medium" value={form.fullName} onChange={e => set("fullName", e.target.value)} required />
           </div>
           <div className="grid gap-2">
-            <Label>Email *</Label>
-            <Input type="email" className="h-11 rounded-xl" value={form.email} onChange={e => set("email", e.target.value)} required />
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Email Address *</Label>
+            <Input type="email" className="h-12 rounded-xl border-border/60 shadow-sm focus-visible:ring-navy font-medium" value={form.email} onChange={e => set("email", e.target.value)} required />
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div className="grid gap-2">
-            <Label>Phone Number *</Label>
-            <Input className="h-11 rounded-xl" value={form.phone} onChange={e => set("phone", e.target.value)} required />
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Phone Number *</Label>
+            <Input className="h-12 rounded-xl border-border/60 shadow-sm focus-visible:ring-navy font-medium" value={form.phone} onChange={e => set("phone", e.target.value)} required />
           </div>
           <div className="grid gap-2">
-            <Label>Payment Method *</Label>
-            <select
-              className="h-11 w-full max-w-full truncate rounded-xl border border-input bg-background px-3 text-xs sm:text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
-              value={form.paymentMethod}
-              onChange={e => set("paymentMethod", e.target.value)}
-            >
-              <option value="online">Online (Razorpay / Cards / UPI)</option>
-              <option value="upi">Direct UPI (QR / VPA)</option>
-              <option value="bank">Bank Transfer (NEFT / RTGS)</option>
-              <option value="cash">Cash Contribution</option>
-            </select>
+            <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Payment Method *</Label>
+            <div className="relative">
+              <select
+                className="h-12 w-full appearance-none rounded-xl border border-border/60 bg-white px-4 text-sm font-semibold text-navy shadow-sm focus:outline-none focus:ring-2 focus:ring-navy"
+                value={form.paymentMethod}
+                onChange={e => set("paymentMethod", e.target.value)}
+              >
+                <option value="online">Instant Online (Card/UPI)</option>
+                <option value="upi">Direct UPI (QR / VPA)</option>
+                <option value="bank">Bank Transfer (NEFT)</option>
+                <option value="cash">Cash Contribution</option>
+              </select>
+              <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 size-4 rotate-90 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
         </div>
 
         {form.paymentMethod !== "online" && (
-          <>
+          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 space-y-4">
             <div className="grid gap-2">
-              <Label>Transaction ID / Reference (UTR) *</Label>
+              <Label className="text-xs font-bold uppercase tracking-wider text-amber-900">Transaction ID / Reference (UTR) *</Label>
               <Input
-                className="h-11 rounded-xl"
+                className="h-12 rounded-xl border-amber-200 bg-white font-medium"
                 placeholder="Enter 12-digit UPI Ref / UTR Number"
                 value={form.transactionId}
                 onChange={e => set("transactionId", e.target.value)}
@@ -268,22 +275,22 @@ function ManualDonationFormInner() {
               />
             </div>
             <div className="grid gap-2">
-              <Label>Payment Screenshot (Optional)</Label>
+              <Label className="text-xs font-bold uppercase tracking-wider text-amber-900">Payment Screenshot (Optional)</Label>
               <input
                 type="file"
                 accept="image/*"
                 onChange={e => setFile(e.target.files[0])}
-                className="block w-full cursor-pointer rounded-xl border border-dashed border-border/70 bg-secondary/40 px-4 py-3 text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1 file:text-xs file:font-semibold file:text-accent-foreground"
+                className="block w-full cursor-pointer rounded-xl border border-dashed border-amber-300 bg-white/50 px-4 py-3 text-sm text-muted-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-amber-100 file:px-3 file:py-1.5 file:text-xs file:font-bold file:text-amber-800 transition hover:bg-white"
               />
             </div>
-          </>
+          </div>
         )}
 
-        <div className="grid gap-2">
-          <Label>Donation Purpose</Label>
+        <div className="grid gap-2 mt-2">
+          <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Donation Purpose (Optional)</Label>
           <Textarea
-            className="min-h-20 rounded-xl"
-            placeholder="e.g. Education fund, General donation..."
+            className="min-h-24 rounded-xl border-border/60 shadow-sm focus-visible:ring-navy font-medium resize-none"
+            placeholder="E.g. Education fund, General donation, or in memory of someone..."
             value={form.purpose}
             onChange={e => set("purpose", e.target.value)}
           />
@@ -291,12 +298,16 @@ function ManualDonationFormInner() {
         <Button
           type="submit"
           disabled={loading}
-          className="h-12 rounded-xl bg-accent text-base font-bold text-accent-foreground shadow-sm shadow-accent/25 hover:bg-accent/90"
+          className="mt-4 h-14 w-full rounded-xl bg-accent text-lg font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:-translate-y-0.5 hover:bg-accent/90"
         >
-          {loading ? "Processing…" : form.paymentMethod === "online" ? (
-            <><Heart className="mr-2 size-5 fill-current" /> Pay Instant via Razorpay (₹{amount || "0"})</>
+          {loading ? "Processing Securely…" : form.paymentMethod === "online" ? (
+            <span className="flex items-center justify-center gap-2">
+              <ShieldCheck className="size-5" /> Pay Securely (₹{amount || "0"})
+            </span>
           ) : (
-            <><Heart className="mr-2 size-5" /> Submit Offline Donation</>
+            <span className="flex items-center justify-center gap-2">
+              <Check className="size-5" /> Submit Donation Details
+            </span>
           )}
         </Button>
         <p className="text-center text-xs text-muted-foreground">
@@ -322,21 +333,28 @@ export default function DonatePage() {
 
   return (
     <>
-      {/* Premium Hero */}
       <section className="relative isolate overflow-hidden bg-navy py-24 text-white sm:py-32">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,153,51,0.2),rgba(5,10,48,1))]"></div>
-        <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80" aria-hidden="true">
-          <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff9933] to-[#138808] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
+        {/* Background Image with dark overlay */}
+        <div className="absolute inset-0 -z-20">
+          <img 
+            src="/children-receiving-school-supplies-india.png" 
+            alt="Donate background" 
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-navy/80 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent" />
         </div>
 
-        <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
-          <div className="mx-auto flex max-w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-xs font-semibold uppercase tracking-widest text-white/90 backdrop-blur-md">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,153,51,0.15),transparent)]"></div>
+        
+        <div className="mx-auto max-w-5xl px-6 text-center lg:px-8 relative z-10">
+          <div className="mx-auto flex max-w-fit items-center gap-2 rounded-full border border-white/20 bg-black/30 px-5 py-2 text-xs font-semibold uppercase tracking-widest text-white/90 backdrop-blur-md">
             <Heart className="size-4 text-[#ff9933] fill-[#ff9933] animate-pulse" /> Your Support Matters
           </div>
-          <h1 className="mt-8 font-serif text-5xl font-bold tracking-tight text-white sm:text-7xl">
-            Give the gift of <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">hope</span>
+          <h1 className="mt-8 font-serif text-5xl font-bold tracking-tight text-white sm:text-7xl drop-shadow-xl">
+            Give the gift of <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500 drop-shadow-md">hope</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/70">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/90 drop-shadow-lg">
             Every contribution, no matter the size, directly empowers rural education, healthcare, and community welfare programs across Gujarat.
           </p>
 
@@ -486,17 +504,14 @@ export default function DonatePage() {
 
         {/* RIGHT — Manual Donation Form */}
         <div className="relative">
-          <div className="sticky top-24 rounded-3xl border border-border/80 bg-white p-6 shadow-xl shadow-navy/5 md:p-8">
-            <div className="mb-8 flex items-center gap-4">
-              <span className="flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-100 to-accent/20 text-accent">
-                <Banknote className="size-6" />
-              </span>
-              <div>
-                <h2 className="font-serif text-2xl font-bold text-navy">Submit Details</h2>
-                <p className="text-sm font-medium text-muted-foreground">Generate your 80G receipt</p>
-              </div>
+          <div className="sticky top-24 overflow-hidden rounded-3xl border border-border/40 bg-white shadow-2xl shadow-navy/5">
+            <div className="bg-gradient-to-r from-navy to-[#0a1142] px-8 py-6 text-white">
+              <h2 className="font-serif text-2xl font-bold">Secure Donation</h2>
+              <p className="mt-1 text-sm font-medium text-white/70">Your contribution is 100% tax exempted under 80G.</p>
             </div>
-            <ManualDonationForm />
+            <div className="p-6 md:p-8">
+              <ManualDonationForm />
+            </div>
           </div>
         </div>
       </div>
@@ -515,6 +530,8 @@ export default function DonatePage() {
           </Button>
         </div>
       </section> */}
+      
+      <FaqSection />
     </>
   )
 }

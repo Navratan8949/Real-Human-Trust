@@ -156,7 +156,7 @@ function TopBar() {
             <YoutubeIcon className="size-3.5" />
           </a>
           <span className="h-3 w-px bg-white/20" />
-          
+
           {/* Multi-language Selector */}
           <div className="hidden sm:block">
             <GoogleTranslate />
@@ -169,8 +169,8 @@ function TopBar() {
                 <LayoutDashboard className="size-3.5" />
                 Go to Dashboard
               </Link>
-              <button 
-                onClick={handleLogout} 
+              <button
+                onClick={handleLogout}
                 className="inline-flex items-center gap-1 text-white/80 hover:text-rose-300 text-[11px] font-semibold transition-colors ml-1"
               >
                 <LogOut className="size-3" />
@@ -246,7 +246,7 @@ export function Navbar() {
           <Logo />
 
           {/* Desktop nav */}
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-2 lg:flex">
             {MAIN_NAV.map((item) =>
               isGroup(item) ? (
                 <HoverDropdown

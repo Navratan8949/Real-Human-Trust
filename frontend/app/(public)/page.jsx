@@ -13,6 +13,7 @@ import { LatestUpdates } from "@/components/sections/latest-updates"
 import { GalleryPreview } from "@/components/sections/gallery-preview"
 import { NewsletterBand } from "@/components/sections/newsletter-band"
 import { ParallaxBanner } from "@/components/sections/parallax-banner"
+import { FaqSection } from "@/components/sections/faq-section"
 
 export const dynamic = "force-dynamic"
 
@@ -50,7 +51,10 @@ export default function HomePage() {
       {/* 10. Visual Proof */}
       <GalleryPreview />
 
-      {/* 11. Final Push */}
+      {/* 11. FAQ Section */}
+      <FaqSection />
+
+      {/* 12. Final Push */}
       <NewsletterBand />
       {/* <CtaBand /> */}
     </>

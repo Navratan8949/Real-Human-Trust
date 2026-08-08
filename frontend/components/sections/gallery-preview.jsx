@@ -23,7 +23,7 @@ export function GalleryPreview() {
   if (gallery.length === 0) return null
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 md:py-24">
+    <section className="mx-auto max-w-7xl px-4 py-16 md:py-20">
       <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
         <SectionHeading
           align="left"

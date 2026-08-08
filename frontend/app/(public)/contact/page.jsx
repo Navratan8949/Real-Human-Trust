@@ -2,6 +2,7 @@ import { Mail, MapPin, Phone, ArrowRight } from "lucide-react"
 import { ContactForm } from "@/components/forms/contact-form"
 import { SITE } from "@/constants/site"
 import { Reveal } from "@/components/shared/reveal"
+import { FaqSection } from "@/components/sections/faq-section"
 
 export const metadata = { title: "Contact Us" }
 
@@ -13,7 +14,7 @@ export default function Page() {
       <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
       <div className="absolute bottom-0 left-0 -z-10 h-[400px] w-[400px] rounded-full bg-navy/5 blur-[100px]" />
 
-      <section className="mx-auto max-w-7xl px-4 py-20 lg:py-32">
+      <section className="mx-auto max-w-7xl px-4 py-16 lg:py-20">
         <div className="grid gap-16 lg:grid-cols-[1fr_1.2fr] lg:gap-24">
           
           {/* Left Column: Contact Information */}
@@ -98,6 +99,8 @@ export default function Page() {
 
         </div>
       </section>
+      
+      <FaqSection />
     </div>
   )
 }

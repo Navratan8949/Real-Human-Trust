@@ -110,17 +110,25 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html, body {
-    overflow-x: hidden;
+
+  html,
+  body {
+    overflow-x: clip;
     max-width: 100vw;
   }
+
   body {
     @apply bg-background text-foreground;
     font-feature-settings: 'cv02', 'cv03', 'cv04';
   }
-  h1, h2, h3, h4 {
+
+  h1,
+  h2,
+  h3,
+  h4 {
     text-wrap: balance;
   }
+
   p {
     text-wrap: pretty;
   }
@@ -128,11 +136,9 @@
 
 @layer utilities {
   .bg-hero-grid {
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      color-mix(in oklab, var(--navy) 12%, transparent) 1px,
-      transparent 0
-    );
+    background-image: radial-gradient(circle at 1px 1px,
+        color-mix(in oklab, var(--navy) 12%, transparent) 1px,
+        transparent 0);
     background-size: 28px 28px;
   }
 
@@ -160,15 +166,19 @@
   .animate-float {
     animation: float-y 5s ease-in-out infinite;
   }
+
   .animate-float-delayed {
     animation: float-y 6.5s ease-in-out 1.2s infinite;
   }
+
   .animate-spin-slow {
     animation: spin-slow 18s linear infinite;
   }
+
   .animate-pulse-soft {
     animation: pulse-soft 3s ease-in-out infinite;
   }
+
   .text-gradient {
     background: linear-gradient(135deg, #f0a04b 0%, #ffe0a3 50%, #f0a04b 100%);
     -webkit-background-clip: text;
@@ -178,19 +188,39 @@
 }
 
 @keyframes float-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
 }
 
 @keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse-soft {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
+
 .scroll-expand {
   position: relative;
   width: 100%;

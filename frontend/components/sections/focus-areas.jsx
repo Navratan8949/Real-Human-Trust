@@ -66,21 +66,25 @@ export function FocusAreas() {
     } catch (e) {}
   }
   return (
-    <section className="bg-background py-20 md:py-28">
+    <section className="bg-white py-16 md:py-20 border-t border-border/40">
       <div className="mx-auto max-w-7xl px-4">
         <SectionHeading
           eyebrow="What We Do"
           title="Our areas of impact"
           description="Six focused programs working together to uplift communities and create lasting, measurable change."
         />
-        <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[240px]">
           {areas.map((a, i) => {
             // Dynamically resolve icon, default to Heart if invalid
             const Icon = LucideIcons[a.icon] || LucideIcons.Heart
             
+            // Bento box specific spans
+            const isLarge = i === 0;
+            const spanClass = isLarge ? "sm:col-span-2 sm:row-span-2" : "col-span-1 row-span-1";
+
             return (
-            <Reveal key={i} delay={(i % 3) * 0.1}>
-              <div className="group relative h-[380px] w-full overflow-hidden rounded-2xl bg-navy shadow-xl">
+            <Reveal key={i} delay={(i % 3) * 0.1} className={spanClass}>
+              <div className="group relative h-full w-full overflow-hidden rounded-3xl bg-navy shadow-xl">
                 {/* Background Image */}
                 <Image
                   src={a.image}
@@ -91,7 +95,7 @@ export function FocusAreas() {
                 />
 
                 {/* Default Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-0" />
+                <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-0" />
 
                 {/* Hover Colored Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-t ${a.color} opacity-0 transition-opacity duration-500 group-hover:opacity-90`} />
@@ -99,12 +103,12 @@ export function FocusAreas() {
                 {/* Content Container */}
                 <div className="absolute inset-0 flex flex-col justify-end p-8 transition-transform duration-500">
                   {/* Icon */}
-                  <div className="mb-4 inline-flex size-14 items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur-md ring-1 ring-white/20 transition-transform duration-500 group-hover:-translate-y-2">
-                    <Icon className="size-7" />
+                  <div className={`mb-3 inline-flex items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur-md ring-1 ring-white/20 transition-transform duration-500 group-hover:-translate-y-2 ${isLarge ? 'size-12' : 'size-10'}`}>
+                    <Icon className={isLarge ? 'size-6' : 'size-5'} />
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-serif text-2xl font-bold text-white transition-transform duration-500 group-hover:-translate-y-2">
+                  <h3 className={`font-serif font-bold text-white transition-transform duration-500 group-hover:-translate-y-2 ${isLarge ? 'text-3xl' : 'text-xl'}`}>
                     {a.title}
                   </h3>
 
@@ -114,10 +118,6 @@ export function FocusAreas() {
                       <p className="mt-3 text-sm leading-relaxed text-white/90 opacity-0 transition-opacity duration-500 delay-100 group-hover:opacity-100">
                         {a.desc}
                       </p>
-
-                      {/* <button className="mt-5 flex items-center text-sm font-bold tracking-widest text-white opacity-0 transition-opacity duration-500 delay-200 group-hover:opacity-100">
-                        LEARN MORE <ArrowRight className="ml-2 size-4" />
-                      </button> */}
                     </div>
                   </div>
                 </div>

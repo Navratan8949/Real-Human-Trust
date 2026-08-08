@@ -60,7 +60,7 @@ export function LatestUpdates() {
 
 
   return (
-    <section className="border-y border-border/60 bg-gradient-to-b from-card via-background to-card py-12 md:py-16">
+    <section className="border-y border-border/60 bg-gradient-to-b from-card via-background to-card py-10 md:py-12">
       <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 lg:grid-cols-12 lg:gap-10">
         
         {/* Left Column: Latest News & Updates (Col 7) */}

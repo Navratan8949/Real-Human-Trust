@@ -36,14 +36,16 @@ const defaultSlides = [
 ]
 
 export function Hero() {
-  const { data: siteContent } = useSelector((state) => state.siteContent)
   const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Dynamic backend fetch
+  const { data: siteContent } = useSelector((state) => state.siteContent)
 
   let slides = defaultSlides
   if (siteContent?.home_hero?.content) {
     try {
-      slides = JSON.parse(siteContent.home_hero.content)
-      if (!Array.isArray(slides) || slides.length === 0) slides = defaultSlides
+      const parsed = JSON.parse(siteContent.home_hero.content)
+      if (Array.isArray(parsed) && parsed.length > 0) slides = parsed
     } catch (e) {
       slides = defaultSlides
     }
@@ -60,11 +62,10 @@ export function Hero() {
         stats = parsedStats.map(s => ({
           value: s.value,
           label: s.label,
-          // Map icon string to component if needed, or fallback
           icon: s.icon === "Users" ? Users : s.icon === "ShieldCheck" ? ShieldCheck : Heart
         }))
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   useEffect(() => {
@@ -87,7 +88,7 @@ export function Hero() {
           className="absolute inset-0 z-0"
         >
           <Image
-            src={slides[currentSlide].image}
+            src={slides[currentSlide]?.image || defaultSlides[0].image}
             alt="Hero Background"
             fill
             priority
@@ -119,19 +120,19 @@ export function Hero() {
             </div>
 
             <h1 className="font-serif text-5xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-[5rem] drop-shadow-xl text-white">
-              {slides[currentSlide].title} <br />
-              <span className="text-accent italic">{slides[currentSlide].highlight}</span>
+              {slides[currentSlide]?.title} <br />
+              <span className="text-accent italic">{slides[currentSlide]?.highlight}</span>
             </h1>
 
             <p className="mt-8 text-lg sm:text-xl leading-relaxed text-white/90 drop-shadow-md max-w-2xl">
-              {slides[currentSlide].desc}
+              {slides[currentSlide]?.desc}
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-4">
               <Button
                 asChild
                 size="lg"
-                className="h-14 rounded-full bg-accent px-8 text-base font-bold text-accent-foreground shadow-lg transition-transform hover:-translate-y-1 hover:bg-accent/90"
+                className="h-14 rounded-full bg-accent px-8 text-base font-bold text-accent-foreground shadow-lg transition-transform hover:-translate-y-1 hover:bg-accent/90 border-0"
               >
                 <Link href="/donate">
                   <Heart className="mr-2 size-5" />
@@ -152,7 +153,7 @@ export function Hero() {
             </div>
 
             {/* Quick Stats row - Centered */}
-            <div className="mt-12 flex flex-wrap justify-center items-center gap-8 border-t border-white/20 pt-8 max-w-xl">
+            <div className="mt-12 flex flex-wrap justify-center items-center gap-8 border-t border-white/20 pt-8 max-w-4xl">
               {stats.map((stat, idx) => (
                 <div key={idx} className="flex items-center gap-3">
                   <div className="flex size-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
@@ -175,9 +176,8 @@ export function Hero() {
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`h-2 rounded-full transition-all duration-500 ${
-              currentSlide === index ? "w-10 bg-accent" : "w-3 bg-white/40 hover:bg-white/70"
-            }`}
+            className={`h-2 rounded-full transition-all duration-500 ${currentSlide === index ? "w-10 bg-accent" : "w-3 bg-white/40 hover:bg-white/70"
+              }`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}

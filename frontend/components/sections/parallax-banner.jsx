@@ -19,7 +19,7 @@ export function ParallaxBanner() {
       <div className="absolute inset-0 bg-[#0a1628]/85" />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto max-w-4xl px-6 py-24 text-center text-white">
+      <div className="relative z-10 mx-auto max-w-4xl px-6 py-16 text-center text-white">
         <Reveal>
           <Quote className="mx-auto mb-8 size-14 text-accent/60 md:size-16" />
           <h2 className="font-serif text-3xl font-bold leading-snug sm:text-4xl md:text-5xl md:leading-tight">

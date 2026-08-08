@@ -20,7 +20,7 @@ export function FounderMessageSection() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-muted/30 py-20 md:py-28">
+    <section className="relative overflow-hidden bg-muted/30 py-16 md:py-20">
       {/* Decorative background elements */}
       <div className="absolute -left-32 -top-32 size-[500px] rounded-full bg-accent/5 blur-3xl" />
       <div className="absolute -bottom-32 -right-32 size-[500px] rounded-full bg-lime/5 blur-3xl" />

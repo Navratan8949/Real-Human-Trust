@@ -57,7 +57,7 @@ export default function Page() {
         sections={sections}
       />
 
-      <section className="bg-secondary/30 py-20 md:py-28">
+      <section className="bg-secondary/30 py-16 md:py-20">
         <div className="mx-auto max-w-7xl px-4">
           <SectionHeading
             eyebrow="What Drives Us"

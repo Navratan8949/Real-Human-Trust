@@ -31,7 +31,7 @@ export function NewsletterBand() {
   }
 
   return (
-    <section className="bg-background py-16 md:py-24">
+    <section className="bg-background py-12 md:py-16">
       <div className="mx-auto max-w-7xl px-4">
         <div className="relative overflow-hidden rounded-3xl bg-navy px-6 py-14 shadow-2xl md:px-16 md:py-20 lg:grid lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-16">
           

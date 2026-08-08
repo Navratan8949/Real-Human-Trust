@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge"
 export function ProjectCard({ project }) {
   return (
     <Link href={`/projects/${project._id}`} className="group block h-full">
-      <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-border/80 bg-card shadow-soft
-       transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/40 hover:shadow-lift
+      <article className="flex h-full flex-col overflow-hidden rounded-[2rem] bg-white shadow-xl shadow-navy/5 border border-border/50
+       transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:border-accent/40
        ">
         <div className="relative aspect-[16/10] overflow-hidden bg-muted flex items-center justify-center">
           {(project.image?.url || (typeof project.image === 'string' && project.image)) ? (
@@ -39,19 +39,19 @@ export function ProjectCard({ project }) {
             </span>
           )} */}
         </div>
-        <div className="flex flex-1 flex-col p-5">
-          <h3 className="font-serif text-lg font-bold leading-snug text-foreground group-hover:text-navy">
+        <div className="flex flex-1 flex-col p-6 sm:p-8">
+          <h3 className="font-serif text-2xl font-bold leading-snug text-navy group-hover:text-accent transition-colors">
             {project.title}
           </h3>
-          <p className="mt-2 flex-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{project.description}</p>
+          <p className="mt-3 flex-1 line-clamp-2 text-base leading-relaxed text-muted-foreground font-medium">{project.description}</p>
           
           {(project.goalAmount > 0 || project.raisedAmount > 0) && (
-            <div className="mt-4">
-              <div className="mb-2 flex justify-between text-xs font-bold">
+            <div className="mt-6 rounded-xl bg-[#faf9f6] p-4 border border-border/40">
+              <div className="mb-2 flex justify-between text-xs font-bold uppercase tracking-wider">
                 <span className="text-muted-foreground">Raised</span>
                 <span className="text-navy">₹{(project.raisedAmount || 0).toLocaleString("en-IN")} / ₹{(project.goalAmount || 1).toLocaleString("en-IN")}</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-secondary">
+              <div className="h-2 overflow-hidden rounded-full bg-border/50">
                 <div 
                   className="h-full rounded-full bg-accent transition-all duration-1000" 
                   style={{ width: `${Math.min(100, ((project.raisedAmount || 0) / (project.goalAmount || 1)) * 100)}%` }} 
@@ -60,8 +60,8 @@ export function ProjectCard({ project }) {
             </div>
           )}
 
-          <div className="mt-5 border-t border-border/50 pt-4">
-            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-navy transition-colors group-hover:text-accent">
+          <div className="mt-6 border-t border-border/40 pt-5">
+            <span className="inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-widest text-navy transition-colors group-hover:text-accent">
               View project
               <ArrowUpRight className="size-3.5 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </span>

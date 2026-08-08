@@ -23,7 +23,7 @@ export async function FeaturedProjects() {
 
   if (projects.length === 0) {
     return (
-      <section className="mx-auto max-w-7xl px-4 py-20 md:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-16 md:py-20">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <SectionHeading
             align="left"
@@ -41,7 +41,7 @@ export async function FeaturedProjects() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 md:py-28">
+    <section className="mx-auto max-w-7xl px-4 py-16 md:py-20">
       <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
         <SectionHeading
           align="left"
