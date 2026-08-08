@@ -7,6 +7,11 @@ const store = configureStore({
     user: userReducer,
     siteContent: siteContentReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }),
 });
 
 export default store;
