@@ -14,6 +14,8 @@ export default function VerifyMemberPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  console.log("VerifyMemberPage mounted. useParams:", params, "memberId:", memberId)
+
   useEffect(() => {
     if (!memberId) return
 

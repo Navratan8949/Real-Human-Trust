@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect } from "react"
-import { use, cache } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -9,9 +8,11 @@ import { Button } from "@/components/ui/button"
 import { registerForEvent } from "@/service/event-registration.service"
 import { getEventById } from "@/service/event.service"
 
-export default function EventDetailPage({ params }) {
-  const resolvedParams = use(params)
-  const id = resolvedParams.id
+import { useParams } from "next/navigation"
+
+export default function EventDetailPage() {
+  const params = useParams()
+  const id = params?.id
   const [event, setEvent] = useState(null)
   const [loading, setLoading] = useState(true)
 
