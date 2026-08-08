@@ -1,10 +1,9 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
-import { ShieldCheck, ShieldAlert, CheckCircle2, Building2, Calendar, UserCheck, HeartHandshake, Loader2, ArrowLeft } from "lucide-react"
+import { useEffect, useState } from "react"
+import { ShieldAlert, CheckCircle2, Building2, Loader2, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import api from "@/service/api"
-
 import { useParams } from "next/navigation"
 
 export default function VerifyMemberPage() {

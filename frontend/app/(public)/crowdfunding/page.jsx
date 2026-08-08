@@ -3,6 +3,7 @@ import { CardsGrid } from "@/components/pages/cards-grid"
 import { getCrowdfundings } from "@/service/crowdfunding.service"
 
 export const metadata = { title: "Support Campaigns" }
+export const dynamic = "force-dynamic"
 
 export default async function Page() {
   let campaigns = []

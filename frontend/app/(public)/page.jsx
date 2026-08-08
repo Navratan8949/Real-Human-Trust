@@ -14,6 +14,8 @@ import { GalleryPreview } from "@/components/sections/gallery-preview"
 import { NewsletterBand } from "@/components/sections/newsletter-band"
 import { ParallaxBanner } from "@/components/sections/parallax-banner"
 
+export const dynamic = "force-dynamic"
+
 export default function HomePage() {
   return (
     <>
