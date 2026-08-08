@@ -12,24 +12,25 @@ export default function NewsDetailPage() {
   const router = useRouter()
   const [news, setNews] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     if (!params.id) return
 
     getNewsById(params.id)
       .then(data => {
-        if (data.success && data.news.status === "published") {
+        if (data.success && data.news) {
           setNews(data.news)
         } else {
-          router.push("/news")
+          setError("News article not found")
         }
       })
       .catch(err => {
         console.error(err)
-        router.push("/news")
+        setError("Failed to load news article")
       })
       .finally(() => setLoading(false))
-  }, [params.id, router])
+  }, [params.id])
 
   if (loading) {
     return (
@@ -39,7 +40,18 @@ export default function NewsDetailPage() {
     )
   }
 
-  if (!news) return null
+  if (error || !news) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center p-6 text-center">
+        <Newspaper className="size-12 text-slate-400 mb-3" />
+        <h2 className="text-xl font-bold text-navy">{error || "Article Not Found"}</h2>
+        <p className="text-sm text-slate-500 mt-1 mb-6">The requested news article could not be loaded.</p>
+        <Link href="/news" className="inline-flex items-center gap-2 rounded-xl bg-navy px-5 py-2.5 text-sm font-semibold text-white hover:bg-navy/90">
+          <ArrowLeft className="size-4" /> Return to News & Press
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <article className="min-h-screen bg-white">

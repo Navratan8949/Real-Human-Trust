@@ -5,9 +5,11 @@ import { ShieldCheck, ShieldAlert, CheckCircle2, Building2, Calendar, UserCheck,
 import Link from "next/link"
 import api from "@/service/api"
 
-export default function VerifyMemberPage({ params }) {
-  const unwrappedParams = use(params)
-  const memberId = unwrappedParams.id
+import { useParams } from "next/navigation"
+
+export default function VerifyMemberPage() {
+  const params = useParams()
+  const memberId = params?.id
 
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)

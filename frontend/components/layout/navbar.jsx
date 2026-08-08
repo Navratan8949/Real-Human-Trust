@@ -242,7 +242,7 @@ export function Navbar() {
           : "border-border/40 bg-white/90 backdrop-blur-md"
           }`}
       >
-        <nav className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-3 px-6 xl:px-8">
+        <nav className="mx-auto flex h-16 sm:h-[72px] max-w-[1440px] items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6 xl:px-8">
           <Logo />
 
           {/* Desktop nav */}

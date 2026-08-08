@@ -7,21 +7,19 @@ export function Logo({ variant = "dark", showText = true, className = "" }) {
   const subColor = variant === "light" ? "text-navy-foreground/70" : "text-muted-foreground"
 
   return (
-    <Link href="/" className={`flex items-center gap-3 ${className}`} aria-label={`${SITE.shortName} home`}>
-      {/* <span className="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-card shadow-sm ring-1 ring-border"> */}
+    <Link href="/" className={`flex items-center gap-2 sm:gap-3 shrink-0 ${className}`} aria-label={`${SITE.shortName} home`}>
       <Image
         src={SITE.logo || "/placeholder.svg"}
         alt={`${SITE.shortName} logo`}
         width={400}
         height={400}
-        className="size-25 object-contain"
+        className="size-11 sm:size-16 shrink-0 object-contain"
         priority
       />
-      {/* </span> */}
       {showText && (
-        <span className="notranslate flex flex-col leading-tight">
-          <span className={`font-serif text-base font-bold tracking-tight ${textColor}`}>Real Human</span>
-          <span className={`text-[10px] font-medium uppercase tracking-[0.14em] ${subColor}`}>
+        <span className="notranslate flex flex-col leading-tight min-w-0">
+          <span className={`font-serif text-xs sm:text-base font-bold tracking-tight ${textColor} truncate`}>Real Human</span>
+          <span className={`text-[8px] sm:text-[10px] font-medium uppercase tracking-wider sm:tracking-[0.14em] ${subColor} truncate`}>
             Education & Charitable Trust
           </span>
         </span>

@@ -41,8 +41,8 @@ export function LatestUpdates() {
     getNews()
       .then(data => {
         if (data.success && data.news?.length > 0) {
-          const published = data.news.filter(n => n.status === "published").slice(0, 3)
-          setNews(published)
+          const published = data.news.filter(n => n.status === "published")
+          setNews(published.length > 0 ? published.slice(0, 3) : data.news.slice(0, 3))
         }
       })
       .catch(console.error)

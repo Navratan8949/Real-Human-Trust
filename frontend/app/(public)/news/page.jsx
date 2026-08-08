@@ -13,9 +13,9 @@ export default function NewsPage() {
   useEffect(() => {
     getNews()
       .then(data => {
-        if (data.success) {
-          // Filter to only show published news
-          setNews(data.news.filter(n => n.status === "published"))
+        if (data.success && data.news?.length > 0) {
+          const published = data.news.filter(n => n.status === "published")
+          setNews(published.length > 0 ? published : data.news)
         }
       })
       .catch(err => console.error(err))
