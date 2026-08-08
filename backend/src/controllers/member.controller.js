@@ -10,11 +10,32 @@ const generateMemberId = () => {
 
 exports.applyMembership = async (req, res) => {
     try {
-        const {
+        let {
             bloodGroup, occupation, membershipType, referredBy
         } = req.body;
 
         const userId = req.user.id;
+
+        // Resolve referredBy string (e.g. "RHTM123456") to actual User ObjectId
+        let resolvedReferrerId = null;
+        if (referredBy && typeof referredBy === "string" && referredBy.trim() !== "") {
+            const referrer = await Member.findOne({ memberId: { $regex: new RegExp(`^${referredBy.trim()}$`, "i") } });
+            if (referrer) {
+                resolvedReferrerId = referrer.user;
+            } else {
+                // Optionally try to find by User's full name if they typed a name
+                const userReferrer = await User.findOne({ fullName: { $regex: new RegExp(`^${referredBy.trim()}$`, "i") } });
+                if (userReferrer) {
+                    resolvedReferrerId = userReferrer._id;
+                }
+            }
+        }
+
+        console.log("=== DEBUG APPLY MEMBERSHIP ===");
+        console.log("req.body.referredBy:", referredBy);
+        console.log("resolvedReferrerId:", resolvedReferrerId);
+        console.log("type of resolvedReferrerId:", typeof resolvedReferrerId);
+
 
         let existingMember = await Member.findOne({ user: userId });
         if (existingMember && existingMember.membershipStatus !== "rejected") {
@@ -48,7 +69,7 @@ exports.applyMembership = async (req, res) => {
             existingMember.bloodGroup = bloodGroup || "";
             existingMember.occupation = occupation || "";
             existingMember.membershipType = membershipType || "general";
-            existingMember.referredBy = referredBy || null;
+            existingMember.referredBy = resolvedReferrerId;
             existingMember.profileImage = profileImage;
             existingMember.idProof = idProof;
             existingMember.membershipStatus = "pending";
@@ -62,7 +83,7 @@ exports.applyMembership = async (req, res) => {
                 bloodGroup: bloodGroup || "",
                 occupation: occupation || "",
                 membershipType: membershipType || "general",
-                referredBy: referredBy || null,
+                referredBy: resolvedReferrerId,
                 profileImage,
                 idProof,
                 membershipStatus: "pending",
