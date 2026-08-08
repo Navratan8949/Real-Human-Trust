@@ -5,6 +5,7 @@ import { selectUser } from "@/redux/features/userSlice"
 import api from "@/service/api"
 import { Loader2, Printer, ShieldAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { QRCodeSVG } from "qrcode.react"
 
 export default function Page() {
   const user = useSelector(selectUser)
@@ -29,10 +30,12 @@ export default function Page() {
 
   if (!member) {
     return (
-      <div className="rounded-2xl border border-border/60 bg-white p-10 text-center shadow-soft">
-        <ShieldAlert className="mx-auto size-12 text-muted-foreground/50" />
-        <h2 className="mt-4 font-serif text-xl font-bold">No ID Card Available</h2>
-        <p className="mt-2 text-sm text-muted-foreground">You must apply for NGO membership to receive an ID card.</p>
+      <div className="mx-auto max-w-md p-6 text-center">
+        <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 border border-amber-200">
+          <ShieldAlert className="size-6" />
+        </div>
+        <h3 className="font-serif text-lg font-bold text-navy">No Membership Found</h3>
+        <p className="mt-1 text-sm text-muted-foreground">You have not applied for a membership yet or your application was not found.</p>
       </div>
     )
   }
@@ -47,46 +50,53 @@ export default function Page() {
     )
   }
 
-  const handlePrint = () => {
-    window.print()
-  }
-
-  const initials = user.fullName?.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() || "U"
+  const origin = typeof window !== "undefined" ? window.location.origin : (process.env.NEXT_PUBLIC_SITE_URL || "https://real-human-trust-nu.vercel.app")
+  const verificationUrl = `${origin}/verify-member/${member.memberId}`
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="font-serif text-2xl font-bold">Digital ID Card</h1>
-        <Button onClick={handlePrint} className="rounded-xl bg-navy text-white hover:bg-navy/90 print:hidden">
-          <Printer className="size-4 mr-2" /> Print ID Card
+    <div className="mx-auto max-w-xl p-4 sm:p-6">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-2xl font-bold text-navy">Member ID Card</h1>
+          <p className="text-xs text-muted-foreground">Official digital identification card for Real Human Trust.</p>
+        </div>
+        <Button onClick={() => window.print()} variant="outline" size="sm" className="rounded-xl gap-2 font-semibold print:hidden">
+          <Printer className="size-4" /> Print ID Card
         </Button>
       </div>
 
-      {/* Style block for print specifically for the ID card */}
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
           body * { visibility: hidden; }
           #id-card, #id-card * { visibility: visible; }
-          #id-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3.375in; height: 2.125in; }
+          #id-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
         }
       `}} />
 
-      <div className="flex justify-center py-10">
-        <div id="id-card" className="relative w-[340px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
-          {/* Header Banner */}
-          <div className="bg-navy px-4 py-3 text-center">
-            <h2 className="font-serif text-[15px] font-bold text-white leading-tight">REAL HUMAN EDUCATION<br/>& CHARITABLE TRUST</h2>
-            <p className="text-[9px] uppercase tracking-wider text-white/80 mt-0.5">Govt. Regd. NGO</p>
+      <div className="flex justify-center">
+        {/* Printable Card Area */}
+        <div id="id-card" className="relative w-full max-w-[380px] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-border/60">
+          {/* Card Header */}
+          <div className="bg-navy p-4 text-center text-white">
+            <h2 className="font-serif text-base font-bold tracking-tight">REAL HUMAN EDUCATION & CHARITABLE TRUST</h2>
+            <p className="text-[9px] uppercase tracking-widest text-accent mt-0.5">Govt. Regd. NGO</p>
           </div>
-          
+
+          {/* Card Body */}
           <div className="p-4">
-            <div className="flex gap-4">
-              {/* Photo */}
-              <div className="shrink-0 flex size-[70px] items-center justify-center overflow-hidden rounded bg-slate-100 border border-slate-200 text-lg font-bold text-slate-400">
-                {member.profileImage?.url ? <img src={member.profileImage.url} alt="Profile" className="h-full w-full object-cover" /> : initials}
+            <div className="flex items-start gap-4">
+              {/* Profile Image */}
+              <div className="size-20 shrink-0 overflow-hidden rounded-xl border border-border bg-secondary">
+                {member.profileImage?.url || user.profileImage?.url ? (
+                  <img src={member.profileImage?.url || user.profileImage?.url} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center font-serif text-xl font-bold text-navy">
+                    {user.fullName?.[0]}
+                  </div>
+                )}
               </div>
-              
-              {/* Details */}
+
+              {/* Info */}
               <div className="space-y-1.5 flex-1">
                 <div>
                   <p className="text-[9px] font-semibold uppercase text-muted-foreground">Name</p>
@@ -114,9 +124,9 @@ export default function Page() {
                 <p className="text-[8px] font-medium text-slate-500">Contact: +91 8735899909</p>
                 <p className="text-[8px] font-medium text-slate-500">Address: Rajkot, Gujarat</p>
               </div>
-              {/* QR Code */}
-              <div className="size-12 shrink-0 rounded bg-white">
-                {member.qrCode && <img src={member.qrCode} alt="QR Code" className="h-full w-full" />}
+              {/* Dynamic QR Code */}
+              <div className="size-12 shrink-0 rounded bg-white p-0.5 border border-slate-200">
+                <QRCodeSVG value={verificationUrl} size={44} className="h-full w-full" />
               </div>
             </div>
           </div>
