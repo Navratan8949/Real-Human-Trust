@@ -64,9 +64,9 @@ export function LatestUpdates() {
       <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 lg:grid-cols-12 lg:gap-10">
         
         {/* Left Column: Latest News & Updates (Col 7) */}
-        <div className="lg:col-span-7 flex flex-col justify-between">
+        <div className="lg:col-span-7 flex flex-col justify-between min-w-0">
           <div>
-            <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-2">
                 <span className="flex size-8 items-center justify-center rounded-lg bg-accent/15 text-accent font-bold">
                   <Newspaper className="size-4" />
@@ -93,7 +93,7 @@ export function LatestUpdates() {
                     href={`/news/${item._id}`} 
                     className="group relative block overflow-hidden rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:border-accent/40 hover:shadow-md"
                   >
-                    <div className="flex items-center justify-between gap-2 mb-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                       <span className="inline-flex items-center gap-1.5 rounded-md bg-accent/10 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-accent">
                         {item.category?.replace("_", " ") || "NEWS"}
                       </span>
@@ -122,7 +122,7 @@ export function LatestUpdates() {
         </div>
 
         {/* Right Column: Quick Services & Next Event (Col 5) */}
-        <div className="lg:col-span-5 flex flex-col justify-between">
+        <div className="lg:col-span-5 flex flex-col justify-between min-w-0">
           <div>
             <div className="flex items-center gap-2 mb-6">
               <span className="flex size-8 items-center justify-center rounded-lg bg-navy/10 text-navy font-bold">
@@ -143,9 +143,9 @@ export function LatestUpdates() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-navy text-sm group-hover:text-accent transition-colors flex items-center justify-between">
-                      {item.title}
-                      <ChevronRight className="size-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
+                    <h3 className="font-semibold text-navy text-sm group-hover:text-accent transition-colors flex items-start sm:items-center justify-between gap-2">
+                      <span className="flex-1 leading-snug">{item.title}</span>
+                      <ChevronRight className="size-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5 sm:mt-0" />
                     </h3>
                     <p className="mt-0.5 text-xs text-muted-foreground truncate">{item.desc}</p>
                   </div>

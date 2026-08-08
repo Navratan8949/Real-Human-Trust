@@ -4,10 +4,11 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
+import { useSelector } from "react-redux"
 import { ArrowRight, Heart, Users, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const slides = [
+const defaultSlides = [
   {
     image: "/hero-community-education-india.png",
     title: "Empowering lives,",
@@ -35,14 +36,43 @@ const slides = [
 ]
 
 export function Hero() {
+  const { data: siteContent } = useSelector((state) => state.siteContent)
   const [currentSlide, setCurrentSlide] = useState(0)
+
+  let slides = defaultSlides
+  if (siteContent?.home_hero?.content) {
+    try {
+      slides = JSON.parse(siteContent.home_hero.content)
+      if (!Array.isArray(slides) || slides.length === 0) slides = defaultSlides
+    } catch (e) {
+      slides = defaultSlides
+    }
+  }
+
+  let stats = [
+    { value: "25,000+", label: "Lives Impacted", icon: Users },
+    { value: "80G & 12A", label: "Govt. Certified", icon: ShieldCheck }
+  ]
+  if (siteContent?.impact_stats?.content) {
+    try {
+      const parsedStats = JSON.parse(siteContent.impact_stats.content)
+      if (Array.isArray(parsedStats) && parsedStats.length > 0) {
+        stats = parsedStats.map(s => ({
+          value: s.value,
+          label: s.label,
+          // Map icon string to component if needed, or fallback
+          icon: s.icon === "Users" ? Users : s.icon === "ShieldCheck" ? ShieldCheck : Heart
+        }))
+      }
+    } catch (e) {}
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
     }, 6000)
     return () => clearInterval(timer)
-  }, [])
+  }, [slides.length])
 
   return (
     <section className="relative flex min-h-[75vh] md:min-h-[85vh] items-center justify-center overflow-hidden bg-black text-white pt-20 pb-16">
@@ -123,24 +153,17 @@ export function Hero() {
 
             {/* Quick Stats row - Centered */}
             <div className="mt-12 flex flex-wrap justify-center items-center gap-8 border-t border-white/20 pt-8 max-w-xl">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
-                  <Users className="size-5 text-accent" />
+              {stats.map((stat, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
+                    <stat.icon className={`size-5 ${idx === 0 ? "text-accent" : "text-lime-400"}`} />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-white drop-shadow-md">{stat.value}</p>
+                    <p className="text-xs text-white/80 drop-shadow-md">{stat.label}</p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="font-bold text-white drop-shadow-md">25,000+</p>
-                  <p className="text-xs text-white/80 drop-shadow-md">Lives Impacted</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm">
-                  <ShieldCheck className="size-5 text-lime-400" />
-                </div>
-                <div className="text-left">
-                  <p className="font-bold text-white drop-shadow-md">80G & 12A</p>
-                  <p className="text-xs text-white/80 drop-shadow-md">Govt. Certified</p>
-                </div>
-              </div>
+              ))}
             </div>
           </motion.div>
         </AnimatePresence>

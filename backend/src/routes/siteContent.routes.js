@@ -3,13 +3,14 @@ const router = express.Router();
 const isAuthenticated = require("../middleware/auth");
 const authorizeRoles = require("../middleware/role");
 const upload = require("../utils/multer");
-const { getAllContent, getContentByKey, upsertContent, deleteContent } = require("../controllers/siteContent.controller");
+const { getAllContent, getContentByKey, upsertContent, deleteContent, uploadMedia } = require("../controllers/siteContent.controller");
 
 // Public
 router.get("/", getAllContent);
 router.get("/:key", getContentByKey);
 
 // Admin only
+router.post("/upload", isAuthenticated, authorizeRoles(["super_admin", "admin"]), upload.single("file"), uploadMedia);
 router.post("/", isAuthenticated, authorizeRoles(["super_admin", "admin"]), upload.single("image"), upsertContent);
 router.put("/:id", isAuthenticated, authorizeRoles(["super_admin", "admin"]), upload.single("image"), upsertContent);
 router.delete("/:id", isAuthenticated, authorizeRoles(["super_admin"]), deleteContent);

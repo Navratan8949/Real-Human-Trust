@@ -64,3 +64,15 @@ exports.deleteContent = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+// Admin — Upload Media Standalone
+exports.uploadMedia = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ success: false, message: "No file provided" });
+        const uploadResult = await uploadOnCloudinary(req.file.path);
+        if (!uploadResult) throw new Error("Cloudinary upload failed");
+        res.status(200).json({ success: true, url: uploadResult.url });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

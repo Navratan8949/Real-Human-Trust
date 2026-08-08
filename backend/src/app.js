@@ -41,7 +41,6 @@ app.use("/api/v1/team", require("./routes/team.routes"));
 app.use("/api/v1/awards", require("./routes/award.routes"));
 app.use("/api/v1/site-content", require("./routes/siteContent.routes"));
 app.use("/api/v1/newsletter", require("./routes/newsletter.routes"));
-
 // Super Admin — Backup
 const isAuthenticated = require("./middleware/auth");
 const authorizeRoles = require("./middleware/role");
