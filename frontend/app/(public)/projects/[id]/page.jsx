@@ -40,7 +40,7 @@ export default async function ProjectDetailPage({ params }) {
     }
     
     // Fetch associated campaigns
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"}/crowdfunding`, { cache: 'no-store' })
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://real-human-trust.onrender.com/api/v1"}/crowdfunding`, { next: { revalidate: 60 } })
     if (res.ok) {
       const cData = await res.json()
       if (cData.success && cData.campaigns) {
