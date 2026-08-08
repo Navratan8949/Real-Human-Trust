@@ -1,10 +1,13 @@
 const express = require("express");
-const { applyMembership, getAllMembers, approveMember, rejectMember, getMyProfile, createMemberDirectly } = require("../controllers/member.controller");
+const { applyMembership, getAllMembers, approveMember, rejectMember, getMyProfile, createMemberDirectly, verifyPublicMember } = require("../controllers/member.controller");
 const isAuthenticated = require("../middleware/auth");
 const authorizeRoles = require("../middleware/role");
 const upload = require("../utils/multer");
 
 const router = express.Router();
+
+// Public route for scanning QR ID cards
+router.get("/verify/:memberId", verifyPublicMember);
 
 router.post("/apply", isAuthenticated, upload.fields([
     { name: "profileImage", maxCount: 1 },

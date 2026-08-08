@@ -5,7 +5,7 @@ const authorizeRoles = require("../middleware/role");
 
 const router = express.Router();
 
-// Admin / Manager routes
-router.get("/stats", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager"]), getDashboardStats);
+// Admin / Manager / Coordinator routes
+router.get("/stats", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager", "coordinator"]), getDashboardStats);
 
 module.exports = router;

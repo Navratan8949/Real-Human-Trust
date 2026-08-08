@@ -19,6 +19,8 @@ const NAV = [
   { href: "/member/complaint", label: "Complaints", icon: MessageSquare },
 ]
 
+import api from "@/service/api"
+
 export default function MemberLayout({ children }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -28,6 +30,7 @@ export default function MemberLayout({ children }) {
   const isAuthenticated = useSelector(selectIsAuthenticated)
   const status = useSelector(selectAuthStatus)
   const [isChecking, setIsChecking] = useState(true)
+  const [memberInfo, setMemberInfo] = useState(null)
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
@@ -39,6 +42,14 @@ export default function MemberLayout({ children }) {
       dispatch(fetchUser())
     }
   }, [dispatch, isAuthenticated, status, router])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      api.get("/members/me")
+        .then(res => setMemberInfo(res.data?.member))
+        .catch(() => {})
+    }
+  }, [isAuthenticated])
 
   useEffect(() => {
     if (status === "succeeded" || status === "failed") {
@@ -64,14 +75,29 @@ export default function MemberLayout({ children }) {
           {NAV.map((item) => { 
             const active = item.exact ? pathname === item.href : pathname.startsWith(item.href); 
             const Icon = item.icon; 
+            
+            let badge = null
+            if (item.href === "/member/id-card" && memberInfo) {
+              if (memberInfo.membershipStatus === "approved") {
+                badge = <span className="ml-auto rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">Active</span>
+              } else if (memberInfo.membershipStatus === "pending") {
+                badge = <span className="ml-auto rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/30">Pending</span>
+              }
+            } else if (item.href === "/member/certificates" && memberInfo?.certificate?.length > 0) {
+              badge = <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-emerald-400 text-[10px] font-extrabold text-slate-950 px-1.5">{memberInfo.certificate.length}</span>
+            } else if (item.href === "/member/appointment-letter" && memberInfo?.appointmentLetter) {
+              badge = <span className="ml-auto rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-300 border border-blue-500/30">Ready</span>
+            }
+
             return (
               <Link 
                 key={item.href} 
                 href={item.href} 
                 className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition", active ? "bg-white/15 font-semibold text-white" : "text-white/65 hover:bg-white/10 hover:text-white")}
               >
-                <Icon className="size-4" />
-                {item.label}
+                <Icon className="size-4 shrink-0" />
+                <span className="truncate flex-1">{item.label}</span>
+                {badge}
               </Link>
             ) 
           })}

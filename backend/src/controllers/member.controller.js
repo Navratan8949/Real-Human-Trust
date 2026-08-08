@@ -261,8 +261,37 @@ exports.createMemberDirectly = async (req, res) => {
             }
         }
 
-        res.status(201).json({ success: true, message: "Member created and approved successfully", data: populatedMember });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
+        res.status(201).json({ success: true, message: "Member created successfully", member: populatedMember });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.verifyPublicMember = async (req, res) => {
+    try {
+        const { memberId } = req.params;
+        const member = await Member.findOne({ memberId: { $regex: new RegExp(`^${memberId.trim()}$`, "i") } })
+            .populate("user", "fullName email mobile profileImage");
+
+        if (!member) {
+            return res.status(404).json({ success: false, message: "Member record not found" });
+        }
+
+        res.status(200).json({
+            success: true,
+            verified: member.membershipStatus === "approved",
+            member: {
+                memberId: member.memberId,
+                fullName: member.user?.fullName || "N/A",
+                profileImage: member.profileImage?.url || member.user?.profileImage?.url || "",
+                membershipType: member.membershipType,
+                bloodGroup: member.bloodGroup,
+                occupation: member.occupation,
+                joiningDate: member.joiningDate,
+                membershipStatus: member.membershipStatus
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };
