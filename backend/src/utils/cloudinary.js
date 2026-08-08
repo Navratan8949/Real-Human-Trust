@@ -21,6 +21,10 @@ const uploadOnCloudinary = async (localFilePath) => {
             access_mode: "public"
         });
 
+        if (response && response.secure_url) {
+            response.url = response.secure_url;
+        }
+
         console.log("file uploaded successfully", response.url);
         fs.unlinkSync(localFilePath);
         return response;

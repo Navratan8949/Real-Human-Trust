@@ -31,6 +31,7 @@ export default function MemberLayout({ children }) {
   const status = useSelector(selectAuthStatus)
   const [isChecking, setIsChecking] = useState(true)
   const [memberInfo, setMemberInfo] = useState(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
@@ -93,6 +94,7 @@ export default function MemberLayout({ children }) {
               <Link 
                 key={item.href} 
                 href={item.href} 
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition", active ? "bg-white/15 font-semibold text-white" : "text-white/65 hover:bg-white/10 hover:text-white")}
               >
                 <Icon className="size-4 shrink-0" />
@@ -105,10 +107,10 @@ export default function MemberLayout({ children }) {
       </div>
 
       <div className="border-t border-white/10 p-3">
-        <Link href="/" className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
+        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="mb-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
           <LayoutDashboard className="size-4" />Back to Website
         </Link>
-        <button onClick={() => { dispatch(clearUser()); router.push("/login") }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
+        <button onClick={() => { setIsMobileMenuOpen(false); dispatch(clearUser()); router.push("/login") }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/55 hover:bg-white/10 hover:text-white">
           <LogOut className="size-4" />Logout
         </button>
       </div>
@@ -127,7 +129,7 @@ export default function MemberLayout({ children }) {
         {/* Mobile Header Bar */}
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border/60 bg-white/90 px-4 backdrop-blur-md md:hidden">
           <div className="flex items-center gap-2">
-            <Sheet>
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger className="inline-flex size-9 items-center justify-center rounded-xl border border-border bg-white text-navy">
                 <Menu className="size-4" />
               </SheetTrigger>
