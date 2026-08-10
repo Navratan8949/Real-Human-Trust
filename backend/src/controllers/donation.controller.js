@@ -266,23 +266,27 @@ exports.verifyManualDonation = async (req, res) => {
             const donorName = donation.fullName || (donation.member && donation.member.user && donation.member.user.fullName) || "Donor";
             const donorEmail = donation.email || (donation.member && donation.member.user && donation.member.user.email) || "";
 
-            const pdfPath = await generateReceiptPDF(donation, donorName, donorEmail);
+            // Run PDF generation and email sending in the background (fire and forget)
+            // This prevents the UI from freezing while waiting for SMTP and PDF generation
+            (async () => {
+                try {
+                    const pdfPath = await generateReceiptPDF(donation, donorName, donorEmail);
 
-            const mailOptions = {
-                from: process.env.EMAIL_USER || "test@gmail.com",
-                to: donorEmail,
-                subject: "Donation Receipt - Real Human Trust",
-                text: "Your offline donation has been verified! Please find your 80G receipt attached.",
-                attachments: [{ filename: `Receipt-${donation.receiptNumber}.pdf`, path: pdfPath }],
-            };
-            try {
-                await transporter.sendMail(mailOptions);
-            } catch (emailError) {
-                console.error("Error sending email:", emailError);
-            }
+                    const mailOptions = {
+                        from: process.env.EMAIL_USER || "test@gmail.com",
+                        to: donorEmail,
+                        subject: "Donation Receipt - Real Human Trust",
+                        text: "Your offline donation has been verified! Please find your 80G receipt attached.",
+                        attachments: [{ filename: `Receipt-${donation.receiptNumber}.pdf`, path: pdfPath }],
+                    };
+                    await transporter.sendMail(mailOptions);
+                } catch (emailError) {
+                    console.error("Error sending email or PDF:", emailError);
+                }
+            })();
         }
 
-        res.status(200).json({ success: true, message: `Donation ${status}`, donation });
+        return res.status(200).json({ success: true, message: `Donation ${status}`, donation });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
