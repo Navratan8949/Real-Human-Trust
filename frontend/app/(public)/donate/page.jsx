@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { useSearchParams, useRouter } from "next/navigation"
 import {
   Heart, Building2, Smartphone, Copy, Check,
@@ -358,10 +359,12 @@ export default function DonatePage() {
       <section className="relative isolate overflow-hidden bg-navy py-24 text-white sm:py-32">
         {/* Background Image with dark overlay */}
         <div className="absolute inset-0 -z-20">
-          <img
+          <Image
             src="/children-receiving-school-supplies-india.png"
             alt="Donate background"
-            className="h-full w-full object-cover"
+            fill
+            priority
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-navy/80 mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/60 to-transparent" />
@@ -432,7 +435,9 @@ export default function DonatePage() {
               <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start">
                 <div className="flex size-40 shrink-0 flex-col items-center justify-center rounded-2xl border border-border bg-white shadow-md text-center ring-4 ring-secondary/50 p-3">
                   {BANK.qrImage ? (
-                    <img src={BANK.qrImage} alt="UPI QR Code" className="w-full h-full object-contain" />
+                    <div className="relative w-full h-full">
+                      <Image src={BANK.qrImage} alt="UPI QR Code" fill className="object-contain" />
+                    </div>
                   ) : (
                     <QRCodeSVG
                       value={`upi://pay?pa=${BANK.upi}&pn=${encodeURIComponent(BANK.accountName)}&cu=INR`}

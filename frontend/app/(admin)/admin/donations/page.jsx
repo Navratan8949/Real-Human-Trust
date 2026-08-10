@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { AdminCrudPage, StatusBadge } from "@/components/admin/crud-page"
 import api from "@/service/api"
 import { toast } from "sonner"
@@ -15,6 +15,7 @@ import {
 
 export default function Page() {
   const [selectedDonation, setSelectedDonation] = useState(null)
+  const crudRef = useRef(null)
 
   const schema = [
     { name: "fullName", label: "Donor Name", required: true },
@@ -165,6 +166,7 @@ export default function Page() {
         customActions={actionButtons}
         hideDelete={true}
         hideEdit={true}
+        crudRef={crudRef}
       />
 
       {/* Donation Detail Modal */}
@@ -244,7 +246,7 @@ export default function Page() {
                   <Button 
                     className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-xs h-10"
                     onClick={() => {
-                      const crud = { fetchAll: () => window.location.reload() }
+                      const crud = { fetchAll: () => crudRef.current?.fetchAll() }
                       handleAction(selectedDonation._id, "verified", crud)
                     }}
                   >
@@ -257,7 +259,7 @@ export default function Page() {
                     variant="outline"
                     className="flex-1 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs h-10"
                     onClick={() => {
-                      const crud = { fetchAll: () => window.location.reload() }
+                      const crud = { fetchAll: () => crudRef.current?.fetchAll() }
                       handleAction(selectedDonation._id, "rejected", crud)
                     }}
                   >

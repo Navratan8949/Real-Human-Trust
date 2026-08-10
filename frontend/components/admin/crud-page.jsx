@@ -25,9 +25,31 @@ const EXPORTABLE_ENDPOINTS = [
   "/newsletter"
 ]
 
-export function AdminCrudPage({ title, description, endpoint, schema, stats = [], columns, primaryAction = "Add new", headerActions, disableActions, customActions, hideDelete, hideEdit, hideExport }) {
+export function AdminCrudPage({ 
+  title, 
+  description, 
+  endpoint, 
+  schema, 
+  stats = [], 
+  columns, 
+  primaryAction = "Add new", 
+  headerActions, 
+  disableActions, 
+  customActions, 
+  hideDelete, 
+  hideEdit, 
+  hideExport,
+  crudRef
+}) {
   const crud = useCrud(endpoint)
   const { data, loading, error, createItem, updateItem, deleteItem } = crud
+
+  useEffect(() => {
+    if (crudRef) {
+      crudRef.current = crud
+    }
+  }, [crud, crudRef])
+
   const user = useSelector(selectUser)
   const module = getAdminModuleForEndpoint(endpoint)
   const canCreate = canAccessAdminModule(module, user, "create")
