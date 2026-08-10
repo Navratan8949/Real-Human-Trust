@@ -136,18 +136,18 @@ export function LatestUpdates() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center gap-1 md:gap-4 rounded-2xl border border-border/70 bg-card p-4 shadow-soft transition-all duration-300 hover:border-accent/40 hover:shadow-md"
+                  className="group flex items-center gap-3 sm:gap-4 rounded-2xl border border-border/70 bg-card p-3 sm:p-4 pr-3 sm:pr-4 shadow-soft transition-all duration-300 hover:border-accent/40 hover:shadow-md"
                 >
-                  <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl border ${item.color} group-hover:scale-105 transition-transform`}>
-                    <item.icon className="size-5" />
+                  <div className={`flex size-10 sm:size-11 shrink-0 items-center justify-center rounded-xl border ${item.color} group-hover:scale-105 transition-transform`}>
+                    <item.icon className="size-4 sm:size-5" />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-navy text-sm group-hover:text-accent transition-colors flex items-start sm:items-center justify-between gap-2">
-                      <span className="flex-1 leading-snug">{item.title}</span>
-                      <ChevronRight className="size-3 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5 sm:mt-0" />
+                    <h3 className="font-semibold text-navy text-sm sm:text-[15px] group-hover:text-accent transition-colors flex items-center justify-between gap-2">
+                      <span className="truncate">{item.title}</span>
+                      <ChevronRight className="size-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0" />
                     </h3>
-                    <p className="mt-0.5 text-xs text-muted-foreground truncate">{item.desc}</p>
+                    <p className="mt-0.5 text-[11px] sm:text-xs text-muted-foreground truncate">{item.desc}</p>
                   </div>
                 </Link>
               ))}
