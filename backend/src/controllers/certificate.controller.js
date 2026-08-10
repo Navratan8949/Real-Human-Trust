@@ -1,23 +1,30 @@
 const Certificate = require("../models/Certificate");
 const Member = require("../models/Member");
-const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { uploadOnCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+const { generateCertificatePDF } = require("../utils/generatePDF");
 const { SendVerificationCode } = require("../utils/sendMail");
+const path = require("path");
+const fs = require("fs");
 
 exports.createCertificate = async (req, res) => {
     try {
         const { member, memberId, certificateNo, title, description, status } = req.body;
         const actualMemberId = member || memberId;
-        let pdf = { public_id: "", url: "" };
-        if (req.file) {
-            const uploadResult = await uploadOnCloudinary(req.file.path);
-            if (uploadResult) {
-                pdf = { public_id: uploadResult.public_id, url: uploadResult.url };
-            }
-        }
 
-        const memberDoc = await Member.findById(actualMemberId);
+        const memberDoc = await Member.findById(actualMemberId).populate("user");
         if (!memberDoc) {
             return res.status(404).json({ success: false, message: "Member not found" });
+        }
+
+        const userName = memberDoc.user ? memberDoc.user.fullName : "Member";
+
+        let pdf = { public_id: "", url: "" };
+        const pdfPath = await generateCertificatePDF({ certificateNo, title, description }, userName);
+        
+        if (pdfPath) {
+            const fileName = path.basename(pdfPath);
+            const localUrl = `${req.protocol}://${req.get("host")}/public/certificates/${fileName}`;
+            pdf = { public_id: fileName, url: localUrl };
         }
 
         const certificate = await Certificate.create({
@@ -41,16 +48,12 @@ exports.createCertificate = async (req, res) => {
         if (populatedCertificate.member && populatedCertificate.member.user && populatedCertificate.member.user.email) {
             const userEmail = populatedCertificate.member.user.email;
             const userName = populatedCertificate.member.user.fullName;
-            try {
-                await SendVerificationCode(
-                    userEmail,
-                    `<p>Dear ${userName},</p><p>We are delighted to inform you that you have been awarded a new certificate: "<strong>${title}</strong>".</p><p>Description: ${description}</p><p>You can view and download your certificate from your Member Dashboard.</p><p>Thank you for your continuous support!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
-                    "Congratulations! You have received a new Certificate - Real Human Trust",
-                    `Dear ${userName},\n\nWe are delighted to inform you that you have been awarded a new certificate: "${title}".\n\nDescription: ${description}\n\nYou can view and download your certificate from your Member Dashboard.\n\nThank you for your continuous support!\n\nBest Regards,\nReal Human Trust Team`
-                );
-            } catch (emailError) {
-                console.error("Error sending certificate email:", emailError);
-            }
+            SendVerificationCode(
+                userEmail,
+                `<p>Dear ${userName},</p><p>We are delighted to inform you that you have been awarded a new certificate: "<strong>${title}</strong>".</p><p>Description: ${description}</p><p>You can view and download your certificate from your Member Dashboard.</p><p>Thank you for your continuous support!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
+                "Congratulations! You have received a new Certificate - Real Human Trust",
+                `Dear ${userName},\n\nWe are delighted to inform you that you have been awarded a new certificate: "${title}".\n\nDescription: ${description}\n\nYou can view and download your certificate from your Member Dashboard.\n\nThank you for your continuous support!\n\nBest Regards,\nReal Human Trust Team`
+            );
         }
 
         res.status(201).json({ success: true, certificate: populatedCertificate });
@@ -93,12 +96,24 @@ exports.updateCertificate = async (req, res) => {
         const { member, memberId, certificateNo, title, description, status } = req.body;
         const actualMemberId = member || memberId;
 
+        const memberDoc = await Member.findById(actualMemberId).populate("user");
+        const userName = memberDoc && memberDoc.user ? memberDoc.user.fullName : "Member";
+
         let pdf = certificate.pdf;
-        if (req.file) {
-            const uploadResult = await uploadOnCloudinary(req.file.path);
-            if (uploadResult) {
-                pdf = { public_id: uploadResult.public_id, url: uploadResult.url };
+        // Always regenerate if updated
+        const pdfPath = await generateCertificatePDF({ certificateNo, title, description }, userName);
+        if (pdfPath) {
+            const fileName = path.basename(pdfPath);
+            const localUrl = `${req.protocol}://${req.get("host")}/public/certificates/${fileName}`;
+            
+            // Delete old PDF from local storage if exists
+            if (pdf && pdf.public_id) {
+                const oldPath = path.join(__dirname, "..", "..", "public", "certificates", pdf.public_id);
+                if (fs.existsSync(oldPath)) {
+                    fs.unlinkSync(oldPath);
+                }
             }
+            pdf = { public_id: fileName, url: localUrl };
         }
 
         const updatedCertificate = await Certificate.findByIdAndUpdate(
@@ -128,6 +143,14 @@ exports.deleteCertificate = async (req, res) => {
             { _id: certificate.member },
             { $pull: { certificate: certificate._id } }
         );
+
+        // Delete the local PDF file
+        if (certificate.pdf && certificate.pdf.public_id) {
+            const oldPath = path.join(__dirname, "..", "..", "public", "certificates", certificate.pdf.public_id);
+            if (fs.existsSync(oldPath)) {
+                fs.unlinkSync(oldPath);
+            }
+        }
 
         await certificate.deleteOne();
         res.status(200).json({ success: true, message: "Certificate deleted successfully" });

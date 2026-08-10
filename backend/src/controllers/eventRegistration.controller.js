@@ -56,7 +56,7 @@ exports.registerForEvent = async (req, res) => {
 
         // Send Email Notification
         try {
-            await SendVerificationCode(
+            SendVerificationCode(
                 email.toLowerCase(),
                 `<p>Dear ${fullName},</p><p>Your registration for the event "<strong>${event.title}</strong>" has been confirmed.</p><p><strong>Date:</strong> ${event.eventDate ? new Date(event.eventDate).toDateString() : "TBA"}<br/><strong>Location:</strong> ${event.location || "TBA"}</p><p>We look forward to seeing you there!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
                 "Event Registration Confirmed - Real Human Trust",

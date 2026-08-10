@@ -336,9 +336,9 @@ export default function DonatePage() {
       <section className="relative isolate overflow-hidden bg-navy py-24 text-white sm:py-32">
         {/* Background Image with dark overlay */}
         <div className="absolute inset-0 -z-20">
-          <img 
-            src="/children-receiving-school-supplies-india.png" 
-            alt="Donate background" 
+          <img
+            src="/children-receiving-school-supplies-india.png"
+            alt="Donate background"
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-navy/80 mix-blend-multiply" />
@@ -346,7 +346,7 @@ export default function DonatePage() {
         </div>
 
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,153,51,0.15),transparent)]"></div>
-        
+
         <div className="mx-auto max-w-5xl px-6 text-center lg:px-8 relative z-10">
           <div className="mx-auto flex max-w-fit items-center gap-2 rounded-full border border-white/20 bg-black/30 px-5 py-2 text-xs font-semibold uppercase tracking-widest text-white/90 backdrop-blur-md">
             <Heart className="size-4 text-[#ff9933] fill-[#ff9933] animate-pulse" /> Your Support Matters
@@ -530,7 +530,7 @@ export default function DonatePage() {
           </Button>
         </div>
       </section> */}
-      
+
       <FaqSection />
     </>
   )

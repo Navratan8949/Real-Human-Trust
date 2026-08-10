@@ -32,7 +32,6 @@ export default function Page() {
     { name: "certificateNo", label: "Certificate Number", type: "text", required: true },
     { name: "title", label: "Certificate Title", type: "text", required: true },
     { name: "description", label: "Description", type: "textarea", required: false },
-    { name: "pdf", label: "Upload PDF", type: "file", required: false },
     { 
       name: "status", 
       label: "Status", 

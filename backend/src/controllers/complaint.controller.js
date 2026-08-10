@@ -90,7 +90,7 @@ exports.resolveComplaint = async (req, res) => {
             const userEmail = complaint.member.user.email;
             const userName = complaint.member.user.fullName;
             try {
-                await SendVerificationCode(
+                SendVerificationCode(
                     userEmail,
                     `<p>Dear ${userName},</p><p>Your complaint regarding "<strong>${complaint.subject}</strong>" has been updated to "<strong>${status}</strong>".</p><p><strong>Admin Reply:</strong><br/>${reply || "No additional remarks."}</p><p>If you have any further issues, please reach out to us.</p><p>Best Regards,<br/>Real Human Trust Support Team</p>`,
                     `Update on your Complaint: ${complaint.subject} - Real Human Trust`,

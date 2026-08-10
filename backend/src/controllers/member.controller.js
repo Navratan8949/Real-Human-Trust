@@ -131,7 +131,7 @@ exports.approveMember = async (req, res) => {
             const userEmail = member.user.email;
             const userName = member.user.fullName;
             try {
-                await SendVerificationCode(
+                SendVerificationCode(
                     userEmail,
                     `<p>Dear ${userName},</p><p>Congratulations! Your membership application has been approved.</p><p>Your unique Member ID is: <strong>${member.memberId}</strong></p><p>You can now log in to the Member Dashboard to access your profile, ID card, and exclusive features.</p><p>Welcome to the team!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
                     "Membership Approved - Real Human Trust",
@@ -165,7 +165,7 @@ exports.rejectMember = async (req, res) => {
             const userEmail = member.user.email;
             const userName = member.user.fullName;
             try {
-                await SendVerificationCode(
+                SendVerificationCode(
                     userEmail,
                     `<p>Dear ${userName},</p><p>We regret to inform you that your membership application has been rejected at this time.</p><p><strong>Reason provided by administration:</strong><br/>${reason || "No reason provided by administration."}</p><p>If you have any questions, please contact our support team.</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
                     "Membership Application Status - Real Human Trust",
@@ -250,7 +250,7 @@ exports.createMemberDirectly = async (req, res) => {
             const loginInfo = !password ? "" : `\nYour account has been created with this email. Password: ${password}\n`;
             const loginInfoHtml = !password ? "" : `<p>Your account has been created with this email. Password: <strong>${password}</strong></p>`;
             try {
-                await SendVerificationCode(
+                SendVerificationCode(
                     userEmail,
                     `<p>Dear ${userName},</p><p>Your membership has been successfully created by the administration.</p><p>Your unique Member ID is: <strong>${member.memberId}</strong></p>${loginInfoHtml}<p>You can log in to the Member Dashboard to access your profile, ID card, and exclusive features.</p><p>Welcome to the team!</p><p>Best Regards,<br/>Real Human Trust Team</p>`,
                     "Welcome to Real Human Trust - Membership Created",
