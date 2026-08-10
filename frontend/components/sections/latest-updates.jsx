@@ -9,26 +9,26 @@ import { getEvents } from "@/service/event.service"
 
 
 const serviceLinks = [
-  { 
-    title: "Register / Join Us", 
-    href: "/signup", 
-    icon: HeartHandshake, 
+  {
+    title: "Register / Join Us",
+    href: "/signup",
+    icon: HeartHandshake,
     desc: "Apply and become part of our active volunteer network.",
-    color: "bg-emerald-500/10 text-emerald-600 border-emerald-200/60" 
+    color: "bg-emerald-500/10 text-emerald-600 border-emerald-200/60"
   },
-  { 
-    title: "Upcoming Events", 
-    href: "/events", 
-    icon: CalendarDays, 
+  {
+    title: "Upcoming Events",
+    href: "/events",
+    icon: CalendarDays,
     desc: "Join health camps, tree plantation & community drives.",
-    color: "bg-amber-500/10 text-amber-600 border-amber-200/60" 
+    color: "bg-amber-500/10 text-amber-600 border-amber-200/60"
   },
-  { 
-    title: "Annual & Audit Reports", 
-    href: "/reports/annual", 
-    icon: BookOpen, 
+  {
+    title: "Annual & Audit Reports",
+    href: "/reports/annual",
+    icon: BookOpen,
     desc: "Access verified 80G tax exemption & financial statements.",
-    color: "bg-blue-500/10 text-blue-600 border-blue-200/60" 
+    color: "bg-blue-500/10 text-blue-600 border-blue-200/60"
   },
 ]
 
@@ -62,7 +62,7 @@ export function LatestUpdates() {
   return (
     <section className="border-y border-border/60 bg-gradient-to-b from-card via-background to-card py-10 md:py-12">
       <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 lg:grid-cols-12 lg:gap-10">
-        
+
         {/* Left Column: Latest News & Updates (Col 7) */}
         <div className="lg:col-span-7 flex flex-col justify-between min-w-0">
           <div>
@@ -73,7 +73,7 @@ export function LatestUpdates() {
                 </span>
                 <h2 className="font-serif text-2xl font-bold text-navy">Latest Updates</h2>
               </div>
-              
+
               <Button asChild variant="ghost" size="sm" className="font-bold text-navy hover:text-accent hover:bg-navy/5">
                 <Link href="/news" className="inline-flex items-center gap-1 text-xs">
                   View All Updates <ArrowRight className="size-3.5" />
@@ -88,9 +88,9 @@ export function LatestUpdates() {
                 </div>
               ) : (
                 news.map((item) => (
-                  <Link 
-                    key={item._id} 
-                    href={`/news/${item._id}`} 
+                  <Link
+                    key={item._id}
+                    href={`/news/${item._id}`}
                     className="group relative block overflow-hidden rounded-2xl border border-border/70 bg-card p-5 shadow-soft transition-all duration-300 hover:border-accent/40 hover:shadow-md"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
@@ -106,7 +106,7 @@ export function LatestUpdates() {
                     <h3 className="font-serif text-base font-bold text-navy group-hover:text-accent transition-colors line-clamp-1">
                       {item.title}
                     </h3>
-                    
+
                     <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                       {item.description}
                     </p>
@@ -133,19 +133,19 @@ export function LatestUpdates() {
 
             <div className="grid gap-3.5">
               {serviceLinks.map((item) => (
-                <Link 
-                  key={item.href} 
-                  href={item.href} 
-                  className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-card p-4 shadow-soft transition-all duration-300 hover:border-accent/40 hover:shadow-md"
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group flex items-center gap-1 md:gap-4 rounded-2xl border border-border/70 bg-card p-4 shadow-soft transition-all duration-300 hover:border-accent/40 hover:shadow-md"
                 >
-                  <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl border ${item.color} group-hover:scale-105 transition-transform`}>
+                  <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl border ${item.color} group-hover:scale-105 transition-transform`}>
                     <item.icon className="size-5" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-navy text-sm group-hover:text-accent transition-colors flex items-start sm:items-center justify-between gap-2">
                       <span className="flex-1 leading-snug">{item.title}</span>
-                      <ChevronRight className="size-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5 sm:mt-0" />
+                      <ChevronRight className="size-3 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5 sm:mt-0" />
                     </h3>
                     <p className="mt-0.5 text-xs text-muted-foreground truncate">{item.desc}</p>
                   </div>
