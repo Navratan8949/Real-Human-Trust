@@ -33,6 +33,7 @@ export default function SiteContentAdminPage() {
   // New states for major pages
   const [storeInfo, setStoreInfo] = useState({ title: "Our Store / Areas of Impact", content: "" })
   const [faqs, setFaqs] = useState([])
+  const [fundAllocation, setFundAllocation] = useState([])
   const [legalPages, setLegalPages] = useState({ privacy: "", terms: "" })
   const [visionMission, setVisionMission] = useState({ vision: "", mission: "", objectives: "" })
 
@@ -131,6 +132,11 @@ export default function SiteContentAdminPage() {
       if (siteContent.donate_details?.content) {
         try { setDonateDetails(JSON.parse(siteContent.donate_details.content)) } catch (e) { }
       }
+
+      // 13. Fund Allocation
+      if (siteContent.fund_allocation?.content) {
+        try { setFundAllocation(JSON.parse(siteContent.fund_allocation.content)) } catch (e) { }
+      }
     }
   }, [siteContent])
 
@@ -206,6 +212,7 @@ export default function SiteContentAdminPage() {
           <TabsTrigger value="legal_pages">Legal (Privacy/Terms)</TabsTrigger>
           <TabsTrigger value="contact_info">Contact Info</TabsTrigger>
           <TabsTrigger value="donate_details">Donate Details</TabsTrigger>
+          <TabsTrigger value="fund_allocation">Fund Allocation</TabsTrigger>
         </TabsList>
 
         {/* FOUNDER MESSAGE TAB */}
@@ -428,6 +435,30 @@ export default function SiteContentAdminPage() {
               <Button onClick={() => saveContent("donate_details", "Donate Details", donateDetails)} disabled={isSaving}>
                 <Save className="mr-2 h-4 w-4" /> Save Donate Details
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* FUND ALLOCATION TAB */}
+        <TabsContent value="fund_allocation">
+          <Card>
+            <CardHeader><CardTitle>Fund Allocation (Where your money goes)</CardTitle></CardHeader>
+            <CardContent className="space-y-6">
+              {fundAllocation.map((item, index) => (
+                <div key={index} className="p-4 border rounded-xl space-y-4 bg-muted/20 relative">
+                  <Button variant="destructive" size="icon" className="absolute right-4 top-4" onClick={() => setFundAllocation(fundAllocation.filter((_, i) => i !== index))}><Trash2 className="h-4 w-4" /></Button>
+                  <h4 className="font-semibold text-accent">Category {index + 1}</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div><label className="text-xs font-semibold block mb-1">Label (e.g. Education)</label><Input value={item.label} onChange={(e) => { const newF = [...fundAllocation]; newF[index].label = e.target.value; setFundAllocation(newF) }} placeholder="Education Programs" /></div>
+                    <div><label className="text-xs font-semibold block mb-1">Percentage (e.g. 45)</label><Input type="number" value={item.pct} onChange={(e) => { const newF = [...fundAllocation]; newF[index].pct = e.target.value; setFundAllocation(newF) }} /></div>
+                    <div><label className="text-xs font-semibold block mb-1">Color</label><div className="flex gap-2"><Input type="color" className="h-10 w-14 p-1 cursor-pointer" value={item.color || "#ff9933"} onChange={(e) => { const newF = [...fundAllocation]; newF[index].color = e.target.value; setFundAllocation(newF) }} /><Input value={item.color} onChange={(e) => { const newF = [...fundAllocation]; newF[index].color = e.target.value; setFundAllocation(newF) }} /></div></div>
+                  </div>
+                </div>
+              ))}
+              <div className="flex gap-4">
+                <Button variant="outline" onClick={() => setFundAllocation([...fundAllocation, { label: "", pct: 0, color: "#ff9933" }])}><Plus className="mr-2 h-4 w-4" /> Add Category</Button>
+                <Button onClick={() => saveContent("fund_allocation", "Fund Allocation", fundAllocation)} disabled={isSaving}><Save className="mr-2 h-4 w-4" /> Save Fund Allocation</Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

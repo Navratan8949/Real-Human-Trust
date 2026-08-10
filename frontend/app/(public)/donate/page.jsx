@@ -354,6 +354,19 @@ export default function DonatePage() {
     } catch(e) {}
   }
 
+  let FUND_ALLOCATION = [
+    { label: "Education Programs", pct: 45, color: "#ff9933" },
+    { label: "Healthcare & Nutrition", pct: 30, color: "#138808" },
+    { label: "Community Empowerment", pct: 15, color: "#4a90d9" },
+    { label: "Administration", pct: 10, color: "#94a3b8" }
+  ];
+
+  if (siteContent?.fund_allocation?.content) {
+    try {
+      FUND_ALLOCATION = JSON.parse(siteContent.fund_allocation.content)
+    } catch(e) {}
+  }
+
   return (
     <>
       <section className="relative isolate overflow-hidden bg-navy py-24 text-white sm:py-32">
@@ -497,19 +510,14 @@ export default function DonatePage() {
             <h3 className="font-serif text-2xl font-bold">Where your money goes</h3>
             <p className="mt-2 text-sm text-white/70">A breakdown of our financial allocation to ensure maximum impact.</p>
             <div className="mt-8 space-y-5">
-              {[
-                ["Education Programs", 45, "#ff9933"],
-                ["Healthcare & Nutrition", 30, "#138808"],
-                ["Community Empowerment", 15, "#4a90d9"],
-                ["Administration", 10, "#94a3b8"],
-              ].map(([label, pct, color]) => (
-                <div key={label} className="group">
+              {FUND_ALLOCATION.map((item) => (
+                <div key={item.label} className="group">
                   <div className="mb-2 flex justify-between text-sm">
-                    <span className="font-medium text-white/90 group-hover:text-white transition-colors">{label}</span>
-                    <span className="font-bold text-white">{pct}%</span>
+                    <span className="font-medium text-white/90 group-hover:text-white transition-colors">{item.label}</span>
+                    <span className="font-bold text-white">{item.pct}%</span>
                   </div>
                   <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
-                    <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${pct}%`, background: color }} />
+                    <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${item.pct}%`, background: item.color }} />
                   </div>
                 </div>
               ))}

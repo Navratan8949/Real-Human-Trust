@@ -17,11 +17,19 @@ async function getFeaturedCampaign() {
       if (data.success && data.campaigns && data.campaigns.length > 0) {
         // Find the first active campaign
         const activeCampaign = data.campaigns.find(c => c.status === "active") || data.campaigns[0];
+        
+        let imageUrl = "/smiling-school-children-india-education.png";
+        if (activeCampaign.image?.url) {
+          imageUrl = activeCampaign.image.url;
+        } else if (typeof activeCampaign.image === 'string' && activeCampaign.image !== '[object Object]' && activeCampaign.image.trim() !== '') {
+          imageUrl = activeCampaign.image;
+        }
+
         return {
           id: activeCampaign._id,
           title: activeCampaign.title,
           description: activeCampaign.description,
-          image: activeCampaign.image?.url || "/smiling-school-children-india-education.png",
+          image: imageUrl,
           targetAmount: activeCampaign.targetAmount,
           raisedAmount: activeCampaign.raisedAmount || 0,
         };
@@ -36,6 +44,7 @@ async function getFeaturedCampaign() {
 
 export async function FeaturedCampaign() {
   const campaign = await getFeaturedCampaign()
+  console.log('campaign', campaign.image)
   const pct = Math.min(Math.round((campaign.raisedAmount / campaign.targetAmount) * 100), 100)
 
   return (
@@ -44,7 +53,7 @@ export async function FeaturedCampaign() {
         <div className="grid overflow-hidden rounded-lg bg-navy shadow-xl lg:grid-cols-2">
           <div className="relative min-h-64 lg:min-h-full">
             <Image
-              src={campaign.image || "/placeholder.svg"}
+              src={campaign.image}
               alt={campaign.title}
               fill
               className="object-cover"

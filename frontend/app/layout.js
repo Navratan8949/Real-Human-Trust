@@ -124,9 +124,9 @@ export default function RootLayout({ children }) {
       </head>
       <body className="font-sans antialiased">
         <ReduxProvider>
-          {/* <SplashScreen> */}
-          {children}
-          {/* </SplashScreen> */}
+          <SplashScreen>
+            {children}
+          </SplashScreen>
           <Toaster position="top-center" richColors />
         </ReduxProvider>
         {process.env.NODE_ENV === "production" && <Analytics />}
