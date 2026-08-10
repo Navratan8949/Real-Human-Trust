@@ -112,7 +112,21 @@ export default function Page() {
     try {
       await api.put(`/donations/${id}/verify`, { status })
       toast.success(`Donation marked as ${status}`)
-      crud.fetchAll()
+      
+      // Update UI immediately
+      if (crudRef.current && crudRef.current.updateLocalItem) {
+        crudRef.current.updateLocalItem(id, { paymentStatus: status })
+      } else if (crud && crud.updateLocalItem) {
+        crud.updateLocalItem(id, { paymentStatus: status })
+      }
+
+      // Also trigger a background fetch to ensure sync
+      if (crudRef.current && crudRef.current.fetchAll) {
+        crudRef.current.fetchAll()
+      } else if (crud && crud.fetchAll) {
+        crud.fetchAll()
+      }
+      
       if (selectedDonation && selectedDonation._id === id) {
         setSelectedDonation(prev => ({ ...prev, paymentStatus: status }))
       }
@@ -245,10 +259,7 @@ export default function Page() {
                 {selectedDonation.paymentStatus !== "verified" && selectedDonation.paymentStatus !== "success" && (
                   <Button 
                     className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-white text-xs h-10"
-                    onClick={() => {
-                      const crud = { fetchAll: () => crudRef.current?.fetchAll() }
-                      handleAction(selectedDonation._id, "verified", crud)
-                    }}
+                    onClick={() => handleAction(selectedDonation._id, "verified", crudRef.current)}
                   >
                     <CheckCircle2 className="mr-1.5 size-4" /> Verify Donation
                   </Button>
@@ -258,10 +269,7 @@ export default function Page() {
                   <Button 
                     variant="outline"
                     className="flex-1 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 font-bold text-xs h-10"
-                    onClick={() => {
-                      const crud = { fetchAll: () => crudRef.current?.fetchAll() }
-                      handleAction(selectedDonation._id, "rejected", crud)
-                    }}
+                    onClick={() => handleAction(selectedDonation._id, "rejected", crudRef.current)}
                   >
                     <XCircle className="mr-1.5 size-4" /> Reject Donation
                   </Button>

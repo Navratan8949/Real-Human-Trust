@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Plus, Download, Loader2, Trash2, Edit, ShieldCheck } from "lucide-react"
 import { AdminPageHeader } from "@/components/admin/page-header"
 import { StatsCard } from "@/components/admin/stats-card"
@@ -25,19 +25,19 @@ const EXPORTABLE_ENDPOINTS = [
   "/newsletter"
 ]
 
-export function AdminCrudPage({ 
-  title, 
-  description, 
-  endpoint, 
-  schema, 
-  stats = [], 
-  columns, 
-  primaryAction = "Add new", 
-  headerActions, 
-  disableActions, 
-  customActions, 
-  hideDelete, 
-  hideEdit, 
+export function AdminCrudPage({
+  title,
+  description,
+  endpoint,
+  schema,
+  stats = [],
+  columns,
+  primaryAction = "Add new",
+  headerActions,
+  disableActions,
+  customActions,
+  hideDelete,
+  hideEdit,
   hideExport,
   crudRef
 }) {
@@ -55,7 +55,7 @@ export function AdminCrudPage({
   const canCreate = canAccessAdminModule(module, user, "create")
   const canEdit = canAccessAdminModule(module, user, "edit")
   const canDelete = canAccessAdminModule(module, user, "delete")
-  
+
   const [modalOpen, setModalOpen] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
 
@@ -88,7 +88,7 @@ export function AdminCrudPage({
         if (row[c.key] !== undefined && row[c.key] !== null) {
           val = row[c.key]
         }
-        
+
         if (!val) {
           if (c.key === "status") {
             val = row.status || row.membershipStatus || row.paymentStatus
@@ -195,9 +195,9 @@ export function AdminCrudPage({
 
   return (
     <div>
-      <AdminPageHeader 
-        title={title} 
-        description={description} 
+      <AdminPageHeader
+        title={title}
+        description={description}
         actions={<>
           {isExportAllowed && (
             <Button variant="outline" size="sm" onClick={handleExportCSV} className="rounded-lg">
@@ -206,9 +206,9 @@ export function AdminCrudPage({
           )}
           {headerActions}
           {primaryAction && canCreate && <Button size="sm" onClick={handleAdd} className="rounded-lg bg-accent font-semibold text-accent-foreground hover:bg-accent/90"><Plus className="size-3.5" />{primaryAction}</Button>}
-        </>} 
+        </>}
       />
-      
+
       {loading && (
         <div className="mb-4 flex items-center justify-end text-xs text-muted-foreground">
           <span className="flex items-center gap-1"><Loader2 className="size-3 animate-spin" /> Loading data...</span>
@@ -222,15 +222,15 @@ export function AdminCrudPage({
       )}
 
       {stats.length > 0 && <div className="mb-6 grid gap-3 sm:grid-cols-3">{stats.map((s) => <StatsCard key={s.label} {...s} />)}</div>}
-      
+
       <DataTable columns={finalColumns} rows={data} />
 
-      <CrudModal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        title={editingItem ? `Edit ${title}` : `Add New ${title}`} 
-        schema={schema} 
-        initialData={editingItem} 
+      <CrudModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={editingItem ? `Edit ${title}` : `Add New ${title}`}
+        schema={schema}
+        initialData={editingItem}
         onSubmit={handleSubmit}
       />
     </div>

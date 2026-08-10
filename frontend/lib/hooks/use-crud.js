@@ -83,6 +83,10 @@ export function useCrud(endpoint) {
     }
   }
 
+  const updateLocalItem = (id, updatedFields) => {
+    setData(prev => prev.map(item => (item._id === id || item.id === id) ? { ...item, ...updatedFields } : item))
+  }
+
   return {
     data,
     loading,
@@ -90,6 +94,7 @@ export function useCrud(endpoint) {
     fetchAll,
     createItem,
     updateItem,
-    deleteItem
+    deleteItem,
+    updateLocalItem
   }
 }
