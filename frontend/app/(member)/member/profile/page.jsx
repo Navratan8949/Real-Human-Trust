@@ -6,11 +6,23 @@ import api from "@/service/api"
 import { CheckCircle2, Loader2, UserCircle2, Mail, Phone, MapPin, Briefcase, Droplet, Calendar, FileText } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from "sonner"
+import { setUser } from "@/redux/features/userSlice"
+import { useDispatch } from "react-redux"
 
 export default function Page() {
   const user = useSelector(selectUser)
+  const dispatch = useDispatch()
   const [member, setMember] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [editOpen, setEditOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [formData, setFormData] = useState({})
+  const [profileImage, setProfileImage] = useState(null)
 
   useEffect(() => {
     async function fetchProfile() {
@@ -26,19 +38,111 @@ export default function Page() {
     fetchProfile()
   }, [])
 
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        fullName: user.fullName || "",
+        mobile: user.mobile || "",
+        dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : "",
+        address: user.address || "",
+        district: user.district || "",
+        state: user.state || "",
+        bloodGroup: member?.bloodGroup || "",
+        occupation: member?.occupation || "",
+      })
+    }
+  }, [user, member, editOpen])
+
   if (loading || !user) return <div className="py-10 text-center"><Loader2 className="mx-auto size-6 animate-spin text-navy" /></div>
 
   const initials = user.fullName?.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase() || "U"
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      const form = new FormData()
+      Object.entries(formData).forEach(([k, v]) => form.append(k, v))
+      if (profileImage) form.append("profileImage", profileImage)
+
+      const res = await api.put("/members/me", form, {
+        headers: { "Content-Type": "multipart/form-data" }
+      })
+      
+      const updatedMember = res.data.member
+      setMember(updatedMember)
+      dispatch(setUser(updatedMember.user))
+      
+      toast.success("Profile updated successfully")
+      setEditOpen(false)
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update profile")
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="font-serif text-2xl font-bold text-navy">My Profile</h1>
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogTrigger render={<Button variant="outline" className="rounded-xl border-navy/20 font-semibold text-navy hover:bg-navy/5" />}>
+            Edit Profile
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="font-serif text-xl">Edit Profile Details</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEditSubmit} className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label>Profile Picture</Label>
+                <Input type="file" accept="image/*" onChange={(e) => setProfileImage(e.target.files[0])} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Full Name</Label><Input value={formData.fullName} onChange={(e) => setFormData({...formData, fullName: e.target.value})} required /></div>
+                <div className="space-y-2"><Label>Mobile</Label><Input value={formData.mobile} onChange={(e) => setFormData({...formData, mobile: e.target.value})} required /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>Date of Birth</Label><Input type="date" value={formData.dob} onChange={(e) => setFormData({...formData, dob: e.target.value})} /></div>
+                {member && (
+                  <div className="space-y-2">
+                    <Label>Blood Group</Label>
+                    <Select value={formData.bloodGroup} onValueChange={(v) => setFormData({...formData, bloodGroup: v})}>
+                      <SelectTrigger><SelectValue placeholder="Select Blood Group" /></SelectTrigger>
+                      <SelectContent>
+                        {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(bg => <SelectItem key={bg} value={bg}>{bg}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2"><Label>Address</Label><Input value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2"><Label>District</Label><Input value={formData.district} onChange={(e) => setFormData({...formData, district: e.target.value})} /></div>
+                <div className="space-y-2"><Label>State</Label><Input value={formData.state} onChange={(e) => setFormData({...formData, state: e.target.value})} /></div>
+              </div>
+              {member && (
+                <div className="space-y-2"><Label>Occupation</Label><Input value={formData.occupation} onChange={(e) => setFormData({...formData, occupation: e.target.value})} /></div>
+              )}
+              <div className="pt-4 flex justify-end gap-2">
+                <Button type="button" variant="ghost" onClick={() => setEditOpen(false)}>Cancel</Button>
+                <Button type="submit" className="bg-navy text-white hover:bg-navy/90" disabled={saving}>
+                  {saving ? <><Loader2 className="mr-2 size-4 animate-spin" /> Saving...</> : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
       <div className="rounded-2xl border border-border/60 bg-white p-6 shadow-soft md:p-8">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <div className="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-navy text-3xl font-bold text-white shadow-md">
             {member?.profileImage?.url ? <img src={member.profileImage.url} alt="Profile" className="h-full w-full object-cover" /> : initials}
           </div>
           <div className="flex-1">
-            <h1 className="font-serif text-2xl font-bold text-navy">{user.fullName}</h1>
+            <h2 className="font-serif text-2xl font-bold text-navy">{user.fullName}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{user.email}</p>
             {member ? (
               <div className="mt-4 flex flex-wrap items-center gap-3">

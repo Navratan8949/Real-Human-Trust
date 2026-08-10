@@ -3,11 +3,12 @@ import { useState } from "react"
 import { AdminCrudPage, StatusBadge } from "@/components/admin/crud-page"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, ShieldCheck, XCircle, Eye, AlertTriangle } from "lucide-react"
+import { Loader2, ShieldCheck, XCircle, Eye, AlertTriangle, Printer } from "lucide-react"
 import api from "@/service/api"
 import { useSelector } from "react-redux"
 import { selectUser } from "@/redux/features/userSlice"
 import { canAccessAdminModule } from "@/lib/admin-permissions"
+import { IdCard } from "@/components/shared/id-card"
 
 const memberSchema = [
   { name: "fullName", label: "Full Name", type: "text", required: true },
@@ -41,6 +42,7 @@ export default function Page() {
   const user = useSelector(selectUser)
   const canReviewMembers = canAccessAdminModule("members", user, "edit")
   const [selectedMember, setSelectedMember] = useState(null)
+  const [idCardMember, setIdCardMember] = useState(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
   const [rejectReason, setRejectReason] = useState("")
@@ -105,20 +107,64 @@ export default function Page() {
             key: "actions",
             label: "Actions",
             render: (r) => (
-              <Button size="sm" variant="outline" onClick={() => {
-                setSelectedMember(r);
-                setIsRejecting(false);
-                setRejectReason("");
-              }} className="rounded-lg h-7 px-3 bg-navy/5 text-navy hover:bg-navy hover:text-white border-navy/20">
-                <Eye className="size-3.5 mr-1.5" /> View
-              </Button>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => {
+                  setSelectedMember(r);
+                  setIsRejecting(false);
+                  setRejectReason("");
+                }} className="rounded-lg h-7 px-3 bg-navy/5 text-navy hover:bg-navy hover:text-white border-navy/20">
+                  <Eye className="size-3.5 mr-1.5" /> View
+                </Button>
+                {r.membershipStatus === 'approved' && (
+                  <Button size="sm" variant="outline" onClick={() => setIdCardMember(r)} className="rounded-lg h-7 px-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border-emerald-200">
+                    <Printer className="size-3.5 mr-1.5" /> ID Card
+                  </Button>
+                )}
+              </div>
             )
           }
         ]}
       />
 
-      {selectedMember && (
+      {idCardMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <style dangerouslySetInnerHTML={{__html: `
+            @media print {
+              body * { visibility: hidden; }
+              #id-card, #id-card * { visibility: visible; }
+              #id-card { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+            }
+          `}} />
+          <div className="w-full max-w-md rounded-2xl bg-slate-50 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-border/50 bg-white px-6 py-4 shrink-0">
+              <h3 className="font-serif text-xl font-bold text-navy">Member ID Card</h3>
+              <button onClick={() => setIdCardMember(null)} className="text-muted-foreground hover:text-navy transition-colors">
+                <XCircle className="size-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto bg-slate-100/50 flex justify-center">
+              <IdCard 
+                member={idCardMember} 
+                user={idCardMember.user} 
+                verificationUrl={`${typeof window !== "undefined" ? window.location.origin : "https://real-human-trust-nu.vercel.app"}/verify-member/${idCardMember.memberId}`} 
+              />
+            </div>
+            
+            <div className="bg-white px-6 py-4 border-t border-border/50 shrink-0 flex gap-4">
+              <Button onClick={() => window.print()} className="flex-1 bg-navy text-white hover:bg-navy/90 h-10 rounded-xl font-bold">
+                <Printer className="size-4 mr-2" /> Print Card
+              </Button>
+              <Button variant="outline" onClick={() => setIdCardMember(null)} className="flex-1 h-10 rounded-xl font-semibold">
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedMember && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 print:hidden">
           <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between border-b border-border/50 bg-slate-50 px-6 py-4 shrink-0">
               <h3 className="font-serif text-xl font-bold text-navy">Review Application</h3>

@@ -184,11 +184,54 @@ exports.rejectMember = async (req, res) => {
 
 exports.getMyProfile = async (req, res) => {
     try {
-        const member = await Member.findOne({ user: req.user.id }).populate("user", "fullName email mobile");
-        if (!member) {
-            return res.status(404).json({ success: false, message: "Membership details not found" });
-        }
+        const member = await Member.findOne({ user: req.user.id }).populate("user", "fullName email mobile dob address state district profileImage");
+        if (!member) return res.status(404).json({ success: false, message: "Member profile not found" });
+
         res.status(200).json({ success: true, member });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.updateMemberProfile = async (req, res) => {
+    try {
+        const { fullName, mobile, dob, address, state, district, bloodGroup, occupation } = req.body;
+
+        const member = await Member.findOne({ user: req.user.id });
+        if (!member) {
+            return res.status(404).json({ success: false, message: "Member profile not found" });
+        }
+
+        const User = require("../models/User");
+        const user = await User.findById(req.user.id);
+
+        if (fullName) user.fullName = fullName;
+        if (mobile) user.mobile = mobile;
+        if (dob) user.dob = dob;
+        if (address) user.address = address;
+        if (state) user.state = state;
+        if (district) user.district = district;
+        await user.save();
+
+        if (bloodGroup) member.bloodGroup = bloodGroup;
+        if (occupation) member.occupation = occupation;
+
+        if (req.file) {
+            const { uploadOnCloudinary } = require("../utils/cloudinary");
+            const uploadResult = await uploadOnCloudinary(req.file.path);
+            if (uploadResult) {
+                member.profileImage = {
+                    public_id: uploadResult.public_id,
+                    url: uploadResult.url
+                };
+            }
+        }
+
+        await member.save();
+
+        const updatedMember = await Member.findById(member._id).populate("user", "fullName email mobile dob address state district profileImage");
+
+        res.status(200).json({ success: true, message: "Profile updated successfully", member: updatedMember });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
