@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
-export function DataTable({ columns, rows, empty = "No records yet.", pagination = true, initialPageSize = 10 }) {
+export function DataTable({ columns, rows, empty = "No records yet.", pagination = true, initialPageSize = 10, loading = false }) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(initialPageSize)
   const totalRows = rows?.length || 0
@@ -28,6 +28,15 @@ export function DataTable({ columns, rows, empty = "No records yet.", pagination
     const start = (page - 1) * pageSize
     return rows.slice(start, start + pageSize)
   }, [page, pageSize, rows, shouldPaginate])
+
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-16 flex flex-col items-center justify-center text-sm text-muted-foreground shadow-soft gap-2">
+        <Loader2 className="size-6 animate-spin text-navy" />
+        <p>Loading data...</p>
+      </div>
+    )
+  }
 
   if (!rows?.length) return <div className="rounded-2xl border border-dashed border-border bg-white px-6 py-16 text-center text-sm text-muted-foreground shadow-soft">{empty}</div>
 

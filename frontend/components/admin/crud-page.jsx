@@ -209,12 +209,6 @@ export function AdminCrudPage({
         </>}
       />
 
-      {loading && (
-        <div className="mb-4 flex items-center justify-end text-xs text-muted-foreground">
-          <span className="flex items-center gap-1"><Loader2 className="size-3 animate-spin" /> Loading data...</span>
-        </div>
-      )}
-
       {error && (
         <div className="mb-4 rounded-xl bg-rose-50 p-4 text-sm text-rose-700 font-medium">
           Error: {error}
@@ -223,7 +217,7 @@ export function AdminCrudPage({
 
       {stats.length > 0 && <div className="mb-6 grid gap-3 sm:grid-cols-3">{stats.map((s) => <StatsCard key={s.label} {...s} />)}</div>}
 
-      <DataTable columns={finalColumns} rows={data} />
+      <DataTable columns={finalColumns} rows={data} loading={loading} />
 
       <CrudModal
         isOpen={modalOpen}

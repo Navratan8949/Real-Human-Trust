@@ -35,13 +35,13 @@ export default function SiteContentAdminPage() {
   const [faqs, setFaqs] = useState([])
   const [legalPages, setLegalPages] = useState({ privacy: "", terms: "" })
   const [visionMission, setVisionMission] = useState({ vision: "", mission: "", objectives: "" })
-  
+
   const [contactInfo, setContactInfo] = useState({
-    address: "", 
-    phones: [{ number: "", showInNavbar: true, showInFooter: true, showInContact: true }], 
+    address: "",
+    phones: [{ number: "", showInNavbar: true, showInFooter: true, showInContact: true }],
     email: "", facebook: "", instagram: "", twitter: "", youtube: ""
   })
-  
+
   const [donateDetails, setDonateDetails] = useState({
     bankName: "", accountName: "", accountNumber: "", ifscCode: "", upiId: "", qrImage: ""
   })
@@ -64,7 +64,7 @@ export default function SiteContentAdminPage() {
 
       // 2. Hero Slider
       if (siteContent.home_hero?.content) {
-        try { setHeroSlides(JSON.parse(siteContent.home_hero.content)) } catch(e){}
+        try { setHeroSlides(JSON.parse(siteContent.home_hero.content)) } catch (e) { }
       }
 
       // 3. About Preview (Home)
@@ -76,22 +76,22 @@ export default function SiteContentAdminPage() {
             content: parsed.description || "",
             points: parsed.points || ["", "", "", ""]
           })
-        } catch(e){}
+        } catch (e) { }
       }
 
       // 4. About Main
       if (siteContent.about_main?.content) {
-        try { setAboutMain(JSON.parse(siteContent.about_main.content)) } catch(e){}
+        try { setAboutMain(JSON.parse(siteContent.about_main.content)) } catch (e) { }
       }
 
       // 5. Focus Areas
       if (siteContent.focus_areas?.content) {
-        try { setFocusAreas(JSON.parse(siteContent.focus_areas.content)) } catch(e){}
+        try { setFocusAreas(JSON.parse(siteContent.focus_areas.content)) } catch (e) { }
       }
 
       // 6. Impact Stats
       if (siteContent.impact_stats?.content) {
-        try { setImpactStats(JSON.parse(siteContent.impact_stats.content)) } catch(e){}
+        try { setImpactStats(JSON.parse(siteContent.impact_stats.content)) } catch (e) { }
       }
 
       // 7. Store / Areas of Impact
@@ -101,7 +101,7 @@ export default function SiteContentAdminPage() {
 
       // 8. FAQs
       if (siteContent.faqs?.content) {
-        try { setFaqs(JSON.parse(siteContent.faqs.content)) } catch(e) {}
+        try { setFaqs(JSON.parse(siteContent.faqs.content)) } catch (e) { }
       }
 
       // 9. Legal Pages
@@ -112,24 +112,24 @@ export default function SiteContentAdminPage() {
 
       // 10. Vision / Mission
       if (siteContent.vision_mission?.content) {
-        try { setVisionMission(JSON.parse(siteContent.vision_mission.content)) } catch(e){}
+        try { setVisionMission(JSON.parse(siteContent.vision_mission.content)) } catch (e) { }
       }
 
       if (siteContent.contact_info?.content) {
-        try { 
+        try {
           const parsed = JSON.parse(siteContent.contact_info.content)
           if (parsed.phone && !parsed.phones) {
             parsed.phones = [{ number: parsed.phone, showInNavbar: true, showInFooter: true, showInContact: true }]
             delete parsed.phone
           }
           if (!parsed.phones) parsed.phones = []
-          setContactInfo(parsed) 
-        } catch(e){}
+          setContactInfo(parsed)
+        } catch (e) { }
       }
 
       // 12. Donate Details
       if (siteContent.donate_details?.content) {
-        try { setDonateDetails(JSON.parse(siteContent.donate_details.content)) } catch(e){}
+        try { setDonateDetails(JSON.parse(siteContent.donate_details.content)) } catch (e) { }
       }
     }
   }, [siteContent])
@@ -215,18 +215,18 @@ export default function SiteContentAdminPage() {
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-semibold">Heading / Title</label>
-                <Input value={founderForm.title} onChange={(e) => setFounderForm({...founderForm, title: e.target.value})} />
+                <Input value={founderForm.title} onChange={(e) => setFounderForm({ ...founderForm, title: e.target.value })} />
               </div>
               <div>
                 <label className="text-sm font-semibold">Detailed Message</label>
-                <Textarea className="min-h-[200px]" value={founderForm.content} onChange={(e) => setFounderForm({...founderForm, content: e.target.value})} />
+                <Textarea className="min-h-[200px]" value={founderForm.content} onChange={(e) => setFounderForm({ ...founderForm, content: e.target.value })} />
               </div>
               <div>
                 <label className="text-sm font-semibold block mb-2">Founder's Photo</label>
                 {founderForm.existingImage && !founderForm.file && (
                   <Image src={founderForm.existingImage} alt="Current" width={100} height={100} className="mb-2 rounded-md object-cover" />
                 )}
-                <Input type="file" accept="image/*" onChange={(e) => setFounderForm({...founderForm, file: e.target.files[0]})} />
+                <Input type="file" accept="image/*" onChange={(e) => setFounderForm({ ...founderForm, file: e.target.files[0] })} />
               </div>
               <Button onClick={handleSaveFounder} disabled={isSaving}>
                 {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Save Founder Message
@@ -242,15 +242,15 @@ export default function SiteContentAdminPage() {
             <CardContent className="space-y-6">
               <div>
                 <label className="text-sm font-semibold block mb-2">Our Vision</label>
-                <RichTextEditor value={visionMission.vision} onChange={val => setVisionMission({...visionMission, vision: val})} />
+                <RichTextEditor value={visionMission.vision} onChange={val => setVisionMission({ ...visionMission, vision: val })} />
               </div>
               <div>
                 <label className="text-sm font-semibold block mb-2">Our Mission</label>
-                <RichTextEditor value={visionMission.mission} onChange={val => setVisionMission({...visionMission, mission: val})} />
+                <RichTextEditor value={visionMission.mission} onChange={val => setVisionMission({ ...visionMission, mission: val })} />
               </div>
               <div>
                 <label className="text-sm font-semibold block mb-2">Our Objectives</label>
-                <RichTextEditor value={visionMission.objectives} onChange={val => setVisionMission({...visionMission, objectives: val})} />
+                <RichTextEditor value={visionMission.objectives} onChange={val => setVisionMission({ ...visionMission, objectives: val })} />
               </div>
               <Button onClick={() => saveContent("vision_mission", "Vision & Mission", visionMission)} disabled={isSaving}>
                 <Save className="mr-2 h-4 w-4" /> Save Vision & Mission
@@ -266,14 +266,14 @@ export default function SiteContentAdminPage() {
             <CardContent className="space-y-6">
               <div>
                 <label className="text-sm font-semibold block mb-2">Privacy Policy</label>
-                <RichTextEditor value={legalPages.privacy} onChange={val => setLegalPages({...legalPages, privacy: val})} />
+                <RichTextEditor value={legalPages.privacy} onChange={val => setLegalPages({ ...legalPages, privacy: val })} />
                 <Button className="mt-2" onClick={() => saveContent("privacy_policy", "Privacy Policy", legalPages.privacy)} disabled={isSaving}>
                   <Save className="mr-2 h-4 w-4" /> Save Privacy Policy
                 </Button>
               </div>
               <div className="pt-6 border-t">
                 <label className="text-sm font-semibold block mb-2">Terms & Conditions</label>
-                <RichTextEditor value={legalPages.terms} onChange={val => setLegalPages({...legalPages, terms: val})} />
+                <RichTextEditor value={legalPages.terms} onChange={val => setLegalPages({ ...legalPages, terms: val })} />
                 <Button className="mt-2" onClick={() => saveContent("terms_conditions", "Terms & Conditions", legalPages.terms)} disabled={isSaving}>
                   <Save className="mr-2 h-4 w-4" /> Save Terms
                 </Button>
@@ -289,11 +289,11 @@ export default function SiteContentAdminPage() {
             <CardContent className="space-y-6">
               <div>
                 <label className="text-sm font-semibold">Title</label>
-                <Input value={storeInfo.title} onChange={(e) => setStoreInfo({...storeInfo, title: e.target.value})} />
+                <Input value={storeInfo.title} onChange={(e) => setStoreInfo({ ...storeInfo, title: e.target.value })} />
               </div>
               <div>
                 <label className="text-sm font-semibold block mb-2">Content / Description</label>
-                <RichTextEditor value={storeInfo.content} onChange={val => setStoreInfo({...storeInfo, content: val})} />
+                <RichTextEditor value={storeInfo.content} onChange={val => setStoreInfo({ ...storeInfo, content: val })} />
               </div>
               <Button onClick={() => saveContent("store_info", storeInfo.title, storeInfo.content)} disabled={isSaving}>
                 <Save className="mr-2 h-4 w-4" /> Save Store Info
@@ -308,16 +308,18 @@ export default function SiteContentAdminPage() {
             <CardHeader><CardTitle>Frequently Asked Questions (FAQ)</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               {faqs.map((faq, index) => (
-                <div key={index} className="p-4 border rounded-xl space-y-3 bg-muted/20 relative">
-                  <Button variant="destructive" size="icon" className="absolute right-4 top-4" onClick={() => setFaqs(faqs.filter((_, i) => i !== index))}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div key={index} className="p-4 border rounded-xl space-y-4 bg-muted/20">
                   <div>
-                    <label className="text-xs font-semibold">Question</label>
-                    <Input value={faq.q} onChange={(e) => { const newFaqs = [...faqs]; newFaqs[index].q = e.target.value; setFaqs(newFaqs) }} />
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-sm font-semibold text-navy">Question {index + 1}</label>
+                      <Button variant="destructive" size="icon" className="h-8 w-8 shrink-0" onClick={() => setFaqs(faqs.filter((_, i) => i !== index))}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Input value={faq.q} onChange={(e) => { const newFaqs = [...faqs]; newFaqs[index].q = e.target.value; setFaqs(newFaqs) }} placeholder="Enter the question..." />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold block mb-2">Answer</label>
+                    <label className="text-sm font-semibold text-navy block mb-2">Answer</label>
                     <RichTextEditor value={faq.a} onChange={val => { const newFaqs = [...faqs]; newFaqs[index].a = val; setFaqs(newFaqs) }} />
                   </div>
                 </div>
@@ -348,12 +350,12 @@ export default function SiteContentAdminPage() {
                         <Input className="flex-1" value={phone.number} onChange={(e) => {
                           const newPhones = [...contactInfo.phones]
                           newPhones[idx].number = e.target.value
-                          setContactInfo({...contactInfo, phones: newPhones})
+                          setContactInfo({ ...contactInfo, phones: newPhones })
                         }} placeholder="+91 XXXXXXXXXX" />
                         <Button variant="destructive" size="icon" className="shrink-0 h-10 w-10" onClick={() => {
                           const newPhones = [...contactInfo.phones]
                           newPhones.splice(idx, 1)
-                          setContactInfo({...contactInfo, phones: newPhones})
+                          setContactInfo({ ...contactInfo, phones: newPhones })
                         }}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -361,37 +363,37 @@ export default function SiteContentAdminPage() {
                       <div className="flex flex-wrap gap-4 text-sm mt-1">
                         <label className="flex items-center gap-1.5 cursor-pointer">
                           <input type="checkbox" checked={phone.showInNavbar} onChange={(e) => {
-                            const newPhones = [...contactInfo.phones]; newPhones[idx].showInNavbar = e.target.checked; setContactInfo({...contactInfo, phones: newPhones})
+                            const newPhones = [...contactInfo.phones]; newPhones[idx].showInNavbar = e.target.checked; setContactInfo({ ...contactInfo, phones: newPhones })
                           }} /> Show in Navbar
                         </label>
                         <label className="flex items-center gap-1.5 cursor-pointer">
                           <input type="checkbox" checked={phone.showInFooter} onChange={(e) => {
-                            const newPhones = [...contactInfo.phones]; newPhones[idx].showInFooter = e.target.checked; setContactInfo({...contactInfo, phones: newPhones})
+                            const newPhones = [...contactInfo.phones]; newPhones[idx].showInFooter = e.target.checked; setContactInfo({ ...contactInfo, phones: newPhones })
                           }} /> Show in Footer
                         </label>
                         <label className="flex items-center gap-1.5 cursor-pointer">
                           <input type="checkbox" checked={phone.showInContact} onChange={(e) => {
-                            const newPhones = [...contactInfo.phones]; newPhones[idx].showInContact = e.target.checked; setContactInfo({...contactInfo, phones: newPhones})
+                            const newPhones = [...contactInfo.phones]; newPhones[idx].showInContact = e.target.checked; setContactInfo({ ...contactInfo, phones: newPhones })
                           }} /> Show in Contact Page
                         </label>
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" onClick={() => setContactInfo({...contactInfo, phones: [...(contactInfo.phones||[]), { number: "", showInNavbar: true, showInFooter: true, showInContact: true }]})}>
+                  <Button variant="outline" size="sm" onClick={() => setContactInfo({ ...contactInfo, phones: [...(contactInfo.phones || []), { number: "", showInNavbar: true, showInFooter: true, showInContact: true }] })}>
                     <Plus className="mr-2 h-4 w-4" /> Add Phone Number
                   </Button>
                 </div>
               </div>
-              
-              <div><label className="text-sm font-semibold">Email Address</label><Input value={contactInfo.email} onChange={e => setContactInfo({...contactInfo, email: e.target.value})} placeholder="info@example.com" /></div>
-              <div><label className="text-sm font-semibold">Office Address</label><Textarea value={contactInfo.address} onChange={e => setContactInfo({...contactInfo, address: e.target.value})} /></div>
-              
+
+              <div><label className="text-sm font-semibold">Email Address</label><Input value={contactInfo.email} onChange={e => setContactInfo({ ...contactInfo, email: e.target.value })} placeholder="info@example.com" /></div>
+              <div><label className="text-sm font-semibold">Office Address</label><Textarea value={contactInfo.address} onChange={e => setContactInfo({ ...contactInfo, address: e.target.value })} /></div>
+
               <h4 className="font-bold pt-4">Social Media Links</h4>
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-sm font-semibold">Facebook URL</label><Input value={contactInfo.facebook} onChange={e => setContactInfo({...contactInfo, facebook: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">Instagram URL</label><Input value={contactInfo.instagram} onChange={e => setContactInfo({...contactInfo, instagram: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">Twitter URL</label><Input value={contactInfo.twitter} onChange={e => setContactInfo({...contactInfo, twitter: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">YouTube URL</label><Input value={contactInfo.youtube} onChange={e => setContactInfo({...contactInfo, youtube: e.target.value})} /></div>
+                <div><label className="text-sm font-semibold">Facebook URL</label><Input value={contactInfo.facebook} onChange={e => setContactInfo({ ...contactInfo, facebook: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">Instagram URL</label><Input value={contactInfo.instagram} onChange={e => setContactInfo({ ...contactInfo, instagram: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">Twitter URL</label><Input value={contactInfo.twitter} onChange={e => setContactInfo({ ...contactInfo, twitter: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">YouTube URL</label><Input value={contactInfo.youtube} onChange={e => setContactInfo({ ...contactInfo, youtube: e.target.value })} /></div>
               </div>
 
               <Button onClick={() => saveContent("contact_info", "Contact Info", contactInfo)} disabled={isSaving}>
@@ -407,18 +409,18 @@ export default function SiteContentAdminPage() {
             <CardHeader><CardTitle>Donate Page Details (Bank & QR)</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div><label className="text-sm font-semibold">Bank Name</label><Input value={donateDetails.bankName} onChange={e => setDonateDetails({...donateDetails, bankName: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">Account Name</label><Input value={donateDetails.accountName} onChange={e => setDonateDetails({...donateDetails, accountName: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">Account Number</label><Input value={donateDetails.accountNumber} onChange={e => setDonateDetails({...donateDetails, accountNumber: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">IFSC Code</label><Input value={donateDetails.ifscCode} onChange={e => setDonateDetails({...donateDetails, ifscCode: e.target.value})} /></div>
-                <div><label className="text-sm font-semibold">UPI ID</label><Input value={donateDetails.upiId} onChange={e => setDonateDetails({...donateDetails, upiId: e.target.value})} /></div>
+                <div><label className="text-sm font-semibold">Bank Name</label><Input value={donateDetails.bankName} onChange={e => setDonateDetails({ ...donateDetails, bankName: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">Account Name</label><Input value={donateDetails.accountName} onChange={e => setDonateDetails({ ...donateDetails, accountName: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">Account Number</label><Input value={donateDetails.accountNumber} onChange={e => setDonateDetails({ ...donateDetails, accountNumber: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">IFSC Code</label><Input value={donateDetails.ifscCode} onChange={e => setDonateDetails({ ...donateDetails, ifscCode: e.target.value })} /></div>
+                <div><label className="text-sm font-semibold">UPI ID</label><Input value={donateDetails.upiId} onChange={e => setDonateDetails({ ...donateDetails, upiId: e.target.value })} /></div>
               </div>
               <div>
                 <label className="text-sm font-semibold block mb-2">UPI QR Code Image</label>
                 <div className="flex gap-4 items-center">
                   {donateDetails.qrImage && <Image src={donateDetails.qrImage} width={100} height={100} className="rounded-md border p-1" alt="QR" />}
                   <div>
-                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setDonateDetails({...donateDetails, qrImage: url}), "qr_image")} />
+                    <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setDonateDetails({ ...donateDetails, qrImage: url }), "qr_image")} />
                     {uploadingImage === "qr_image" && <Loader2 className="animate-spin h-5 w-5 text-accent mt-2" />}
                   </div>
                 </div>
@@ -468,13 +470,13 @@ export default function SiteContentAdminPage() {
           <Card>
             <CardHeader><CardTitle>About Section (Homepage)</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div><label className="text-sm font-semibold">Heading</label><Input value={aboutPreview.title} onChange={(e) => setAboutPreview({...aboutPreview, title: e.target.value})} /></div>
-              <div><label className="text-sm font-semibold">Description</label><Textarea className="min-h-[100px]" value={aboutPreview.content} onChange={(e) => setAboutPreview({...aboutPreview, content: e.target.value})} /></div>
+              <div><label className="text-sm font-semibold">Heading</label><Input value={aboutPreview.title} onChange={(e) => setAboutPreview({ ...aboutPreview, title: e.target.value })} /></div>
+              <div><label className="text-sm font-semibold">Description</label><Textarea className="min-h-[100px]" value={aboutPreview.content} onChange={(e) => setAboutPreview({ ...aboutPreview, content: e.target.value })} /></div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold">Bullet Points</label>
                 {aboutPreview.points.map((point, index) => (
                   <Input key={index} value={point} onChange={(e) => {
-                    const newP = [...aboutPreview.points]; newP[index] = e.target.value; setAboutPreview({...aboutPreview, points: newP});
+                    const newP = [...aboutPreview.points]; newP[index] = e.target.value; setAboutPreview({ ...aboutPreview, points: newP });
                   }} />
                 ))}
               </div>
@@ -492,7 +494,7 @@ export default function SiteContentAdminPage() {
                 <label className="text-sm font-semibold">Side Image</label>
                 <div className="flex gap-2 items-center mt-1">
                   {aboutMain.image && <Image src={aboutMain.image} width={60} height={60} className="rounded object-cover h-14 w-14 shrink-0 border" alt="preview" />}
-                  <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setAboutMain({...aboutMain, image: url}), "about_main")} />
+                  <Input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, (url) => setAboutMain({ ...aboutMain, image: url }), "about_main")} />
                   {uploadingImage === "about_main" && <Loader2 className="animate-spin h-5 w-5 shrink-0 text-accent" />}
                 </div>
               </div>
@@ -501,7 +503,7 @@ export default function SiteContentAdminPage() {
                 <div className="grid grid-cols-3 gap-2">
                   {aboutMain.stats.map((stat, idx) => (
                     <Input key={idx} value={stat} onChange={(e) => {
-                      const newStats = [...aboutMain.stats]; newStats[idx] = e.target.value; setAboutMain({...aboutMain, stats: newStats});
+                      const newStats = [...aboutMain.stats]; newStats[idx] = e.target.value; setAboutMain({ ...aboutMain, stats: newStats });
                     }} />
                   ))}
                 </div>
@@ -509,16 +511,24 @@ export default function SiteContentAdminPage() {
               <div className="space-y-4 pt-4 border-t">
                 <label className="text-sm font-semibold">Content Sections</label>
                 {aboutMain.sections.map((section, idx) => (
-                  <div key={idx} className="p-4 border rounded-xl space-y-3 bg-muted/20 relative">
-                    <Button variant="destructive" size="icon" className="absolute right-4 top-4" onClick={() => setAboutMain({...aboutMain, sections: aboutMain.sections.filter((_, i) => i !== idx)})}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <div><label className="text-xs font-semibold">Heading</label><Input value={section[0]} onChange={(e) => { const newS = [...aboutMain.sections]; newS[idx][0] = e.target.value; setAboutMain({...aboutMain, sections: newS}) }} /></div>
-                    <div><label className="text-xs font-semibold block mb-2">Paragraph</label><RichTextEditor value={section[1]} onChange={(val) => { const newS = [...aboutMain.sections]; newS[idx][1] = val; setAboutMain({...aboutMain, sections: newS}) }} /></div>
+                  <div key={idx} className="p-4 border rounded-xl space-y-4 bg-muted/20">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-semibold text-navy">Section {idx + 1} Heading</label>
+                        <Button variant="destructive" size="icon" className="h-8 w-8 shrink-0" onClick={() => setAboutMain({ ...aboutMain, sections: aboutMain.sections.filter((_, i) => i !== idx) })}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Input value={section[0]} onChange={(e) => { const newS = [...aboutMain.sections]; newS[idx][0] = e.target.value; setAboutMain({ ...aboutMain, sections: newS }) }} placeholder="Enter heading..." />
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold text-navy block mb-2">Paragraph</label>
+                      <RichTextEditor value={section[1]} onChange={(val) => { const newS = [...aboutMain.sections]; newS[idx][1] = val; setAboutMain({ ...aboutMain, sections: newS }) }} />
+                    </div>
                   </div>
                 ))}
                 <div className="flex gap-4">
-                  <Button variant="outline" onClick={() => setAboutMain({...aboutMain, sections: [...aboutMain.sections, ["", ""]]})}><Plus className="mr-2 h-4 w-4" /> Add Section</Button>
+                  <Button variant="outline" onClick={() => setAboutMain({ ...aboutMain, sections: [...aboutMain.sections, ["", ""]] })}><Plus className="mr-2 h-4 w-4" /> Add Section</Button>
                   <Button onClick={() => saveContent("about_main", "About Us (Main Page)", aboutMain)} disabled={isSaving}><Save className="mr-2 h-4 w-4" /> Save About Page Content</Button>
                 </div>
               </div>
