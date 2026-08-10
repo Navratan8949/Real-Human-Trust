@@ -1,12 +1,41 @@
+"use client"
+
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchSiteContent } from "@/redux/features/siteContentSlice"
 import { Mail, MapPin, Phone, ArrowRight } from "lucide-react"
 import { ContactForm } from "@/components/forms/contact-form"
-import { SITE } from "@/constants/site"
+import { SITE as DEFAULT_SITE } from "@/constants/site"
 import { Reveal } from "@/components/shared/reveal"
 import { FaqSection } from "@/components/sections/faq-section"
 
-export const metadata = { title: "Contact Us" }
-
 export default function Page() {
+  const dispatch = useDispatch()
+  const { data: siteContent } = useSelector((state) => state.siteContent)
+
+  useEffect(() => {
+    dispatch(fetchSiteContent())
+  }, [dispatch])
+
+  let SITE = { ...DEFAULT_SITE }
+  if (siteContent?.contact_info?.content) {
+    try {
+      const parsed = JSON.parse(siteContent.contact_info.content)
+      if (parsed.address) SITE.address = parsed.address
+      if (parsed.email) SITE.email = parsed.email
+      if (parsed.phones && Array.isArray(parsed.phones)) {
+        const contactPhones = parsed.phones.filter(p => p.showInContact).map(p => p.number).filter(Boolean)
+        if (contactPhones.length > 0) SITE.phones = contactPhones
+      } else if (parsed.phone) {
+        SITE.phones = [parsed.phone]
+      }
+      if (parsed.facebook) SITE.socials.facebook = parsed.facebook
+      if (parsed.instagram) SITE.socials.instagram = parsed.instagram
+      if (parsed.twitter) SITE.socials.twitter = parsed.twitter
+      if (parsed.youtube) SITE.socials.youtube = parsed.youtube
+    } catch(e) {}
+  }
+
   return (
     <div className="relative min-h-screen bg-background overflow-hidden">
       

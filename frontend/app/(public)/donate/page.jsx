@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import {
   Heart, Building2, Smartphone, Copy, Check,
   ArrowRight, ShieldCheck, BadgeCheck, Banknote,
@@ -19,15 +19,7 @@ import { QRCodeSVG } from "qrcode.react"
 import Script from "next/script"
 import { FaqSection } from "@/components/sections/faq-section"
 
-// Bank / UPI details
-const BANK = {
-  accountName: "Real Human Education & Charitable Trust",
-  accountNumber: "1234567890123456",
-  ifsc: "SBIN0001234",
-  bank: "State Bank of India",
-  branch: "Rajkot Main Branch",
-  upi: "realhumantrust@sbi",
-}
+// Dynamic Bank Details are now fetched from Redux state
 
 const QUICK_AMOUNTS = [500, 1000, 2100, 5000, 11000, 21000]
 
@@ -55,6 +47,7 @@ function ManualDonationFormInner() {
   const [linkedTitle, setLinkedTitle] = useState("")
   const [linkedType, setLinkedType] = useState("")
   const searchParams = useSearchParams()
+  const router = useRouter()
   const projectId = searchParams.get("projectId")
   const campaignId = searchParams.get("campaignId")
 
@@ -133,6 +126,7 @@ function ManualDonationFormInner() {
             const verifyData = await verifyRes.json()
             if (!verifyRes.ok) throw new Error(verifyData.message || "Payment verification failed")
             toast.success("Payment successful! 80G Receipt sent to your email.")
+            router.push(`/donation-success?id=${donationId}`)
             setForm({ fullName: "", email: "", phone: "", paymentMethod: "online", transactionId: "", purpose: "" })
             setAmount("")
           } catch (err) {
@@ -176,6 +170,7 @@ function ManualDonationFormInner() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.message)
       toast.success("Donation submitted! We'll verify within 24 hours.")
+      router.push(`/donation-success?id=${data.donation._id}`)
       setForm({ fullName: "", email: "", phone: "", paymentMethod: "upi", transactionId: "", purpose: "" })
       setAmount(""); setFile(null)
     } catch (err) {
@@ -328,8 +323,35 @@ function ManualDonationForm() {
   )
 }
 
+import { useDispatch, useSelector } from "react-redux"
+import { fetchSiteContent } from "@/redux/features/siteContentSlice"
+
 export default function DonatePage() {
   const [activeTab, setActiveTab] = useState("upi")
+  const dispatch = useDispatch()
+  const { data: siteContent } = useSelector((state) => state.siteContent)
+
+  useEffect(() => {
+    dispatch(fetchSiteContent())
+  }, [dispatch])
+
+  // Parse donate details from Redux or fallback to default
+  let BANK = {
+    accountName: "Real Human Education & Charitable Trust",
+    accountNumber: "1234567890123456",
+    ifsc: "SBIN0001234",
+    bank: "State Bank of India",
+    branch: "Rajkot Main Branch",
+    upi: "realhumantrust@sbi",
+    qrImage: ""
+  }
+
+  if (siteContent?.donate_details?.content) {
+    try {
+      const parsed = JSON.parse(siteContent.donate_details.content)
+      BANK = { ...BANK, ...parsed, upi: parsed.upiId, ifsc: parsed.ifscCode }
+    } catch(e) {}
+  }
 
   return (
     <>
@@ -409,11 +431,15 @@ export default function DonatePage() {
             <div className="rounded-2xl border border-border/70 bg-gradient-to-b from-white to-secondary/20 p-8 shadow-sm">
               <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start">
                 <div className="flex size-40 shrink-0 flex-col items-center justify-center rounded-2xl border border-border bg-white shadow-md text-center ring-4 ring-secondary/50 p-3">
-                  <QRCodeSVG
-                    value={`upi://pay?pa=${BANK.upi}&pn=${encodeURIComponent(BANK.accountName)}&cu=INR`}
-                    size={110}
-                    level="Q"
-                  />
+                  {BANK.qrImage ? (
+                    <img src={BANK.qrImage} alt="UPI QR Code" className="w-full h-full object-contain" />
+                  ) : (
+                    <QRCodeSVG
+                      value={`upi://pay?pa=${BANK.upi}&pn=${encodeURIComponent(BANK.accountName)}&cu=INR`}
+                      size={110}
+                      level="Q"
+                    />
+                  )}
                   <p className="mt-2 text-[10px] font-bold text-muted-foreground">Scan via any UPI App</p>
                 </div>
                 <div className="flex-1 space-y-5 text-sm">

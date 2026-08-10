@@ -106,6 +106,7 @@ import { toast } from "sonner"
 
 function TopBar() {
   const user = useSelector(selectUser)
+  const { data: siteContent } = useSelector((state) => state.siteContent)
   const dispatch = useDispatch()
 
   const handleLogout = async () => {
@@ -118,23 +119,44 @@ function TopBar() {
     }
   }
 
+  let site = { ...SITE }
+  if (siteContent?.contact_info?.content) {
+    try {
+      const parsed = JSON.parse(siteContent.contact_info.content)
+      if (parsed.email) site.email = parsed.email
+      if (parsed.phones && Array.isArray(parsed.phones)) {
+        const navbarPhones = parsed.phones.filter(p => p.showInNavbar).map(p => p.number).filter(Boolean)
+        if (navbarPhones.length > 0) site.phones = navbarPhones
+      } else if (parsed.phone) {
+        site.phones = [parsed.phone]
+      }
+      if (parsed.facebook) site.socials.facebook = parsed.facebook
+      if (parsed.instagram) site.socials.instagram = parsed.instagram
+      if (parsed.twitter) site.socials.twitter = parsed.twitter
+      if (parsed.youtube) site.socials.youtube = parsed.youtube
+    } catch(e) {}
+  }
+
   return (
     <div className="hidden bg-navy text-white md:block">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2 text-[12px]">
         <div className="flex items-center gap-5">
+          {site.phones.map((phone, idx) => (
+            <a
+              key={idx}
+              href={`tel:${phone.replace(/\s/g, "")}`}
+              className="inline-flex items-center gap-1.5 text-white/80 transition hover:text-accent"
+            >
+              <Phone className="size-3.5 text-accent" />
+              {phone}
+            </a>
+          ))}
           <a
-            href={`tel:${SITE.phones[0].replace(/\s/g, "")}`}
-            className="inline-flex items-center gap-1.5 text-white/80 transition hover:text-accent"
-          >
-            <Phone className="size-3.5 text-accent" />
-            {SITE.phones[0]}
-          </a>
-          <a
-            href={`mailto:${SITE.email}`}
+            href={`mailto:${site.email}`}
             className="inline-flex items-center gap-1.5 text-white/80 transition hover:text-accent"
           >
             <Mail className="size-3.5 text-accent" />
-            {SITE.email}
+            {site.email}
           </a>
           <span className="hidden text-white/40 xl:inline">·</span>
           <span className="hidden text-white/55 xl:inline">
@@ -143,15 +165,15 @@ function TopBar() {
         </div>
         {/* Social icons + Auth links */}
         <div className="flex items-center gap-3">
-          <a href={SITE.socials.facebook} target="_blank" rel="noreferrer"
+          <a href={site.socials.facebook} target="_blank" rel="noreferrer"
             className="text-white/55 transition hover:text-accent" aria-label="Facebook">
             <FacebookIcon className="size-3.5" />
           </a>
-          <a href={SITE.socials.instagram} target="_blank" rel="noreferrer"
+          <a href={site.socials.instagram} target="_blank" rel="noreferrer"
             className="text-white/55 transition hover:text-accent" aria-label="Instagram">
             <InstagramIcon className="size-3.5" />
           </a>
-          <a href={SITE.socials.youtube} target="_blank" rel="noreferrer"
+          <a href={site.socials.youtube} target="_blank" rel="noreferrer"
             className="text-white/55 transition hover:text-accent" aria-label="YouTube">
             <YoutubeIcon className="size-3.5" />
           </a>
@@ -198,6 +220,7 @@ function TopBar() {
 export function Navbar() {
   const pathname = usePathname()
   const user = useSelector(selectUser)
+  const { data: siteContent } = useSelector((state) => state.siteContent)
   const dispatch = useDispatch()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -210,6 +233,24 @@ export function Navbar() {
     } catch (err) {
       toast.error("Error logging out")
     }
+  }
+
+  let site = { ...SITE }
+  if (siteContent?.contact_info?.content) {
+    try {
+      const parsed = JSON.parse(siteContent.contact_info.content)
+      if (parsed.email) site.email = parsed.email
+      if (parsed.phones && Array.isArray(parsed.phones)) {
+        const navbarPhones = parsed.phones.filter(p => p.showInNavbar).map(p => p.number).filter(Boolean)
+        if (navbarPhones.length > 0) site.phones = navbarPhones
+      } else if (parsed.phone) {
+        site.phones = [parsed.phone]
+      }
+      if (parsed.facebook) site.socials.facebook = parsed.facebook
+      if (parsed.instagram) site.socials.instagram = parsed.instagram
+      if (parsed.twitter) site.socials.twitter = parsed.twitter
+      if (parsed.youtube) site.socials.youtube = parsed.youtube
+    } catch(e) {}
   }
 
   useEffect(() => {
@@ -381,21 +422,23 @@ export function Navbar() {
                     <p className="text-xs font-semibold uppercase tracking-wider text-accent">
                       Need help?
                     </p>
-                    <a href={`tel:${SITE.phones[0].replace(/\s/g, "")}`} className="mt-2 block text-sm font-medium hover:text-accent transition-colors">
-                      {SITE.phones[0]}
-                    </a>
-                    <a href={`mailto:${SITE.email}`} className="mt-1 block text-sm text-white/70 hover:text-accent transition-colors">
-                      {SITE.email}
+                    {site.phones.map((phone, idx) => (
+                      <a key={idx} href={`tel:${phone.replace(/\s/g, "")}`} className="mt-2 block text-sm font-medium hover:text-accent transition-colors">
+                        {phone}
+                      </a>
+                    ))}
+                    <a href={`mailto:${site.email}`} className="mt-1 block text-sm text-white/70 hover:text-accent transition-colors">
+                      {site.email}
                     </a>
                     {/* Social icons in mobile menu */}
                     <div className="mt-3 flex items-center gap-4">
-                      <a href={SITE.socials.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="text-white/50 hover:text-accent transition-colors">
+                      <a href={site.socials.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" className="text-white/50 hover:text-accent transition-colors">
                         <FacebookIcon className="size-4" />
                       </a>
-                      <a href={SITE.socials.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="text-white/50 hover:text-accent transition-colors">
+                      <a href={site.socials.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="text-white/50 hover:text-accent transition-colors">
                         <InstagramIcon className="size-4" />
                       </a>
-                      <a href={SITE.socials.youtube} target="_blank" rel="noreferrer" aria-label="YouTube" className="text-white/50 hover:text-accent transition-colors">
+                      <a href={site.socials.youtube} target="_blank" rel="noreferrer" aria-label="YouTube" className="text-white/50 hover:text-accent transition-colors">
                         <YoutubeIcon className="size-4" />
                       </a>
                     </div>

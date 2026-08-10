@@ -65,6 +65,18 @@ export function FocusAreas() {
       }
     } catch (e) {}
   }
+
+  const GRADIENTS = [
+    "from-blue-600/80 to-navy/90",
+    "from-rose-600/80 to-navy/90",
+    "from-orange-600/80 to-navy/90",
+    "from-violet-600/80 to-navy/90",
+    "from-emerald-600/80 to-navy/90",
+    "from-amber-600/80 to-navy/90",
+    "from-cyan-600/80 to-navy/90",
+    "from-pink-600/80 to-navy/90",
+  ]
+
   return (
     <section className="bg-white py-16 md:py-20 border-t border-border/40">
       <div className="mx-auto max-w-7xl px-4">
@@ -81,6 +93,8 @@ export function FocusAreas() {
             // Bento box specific spans
             const isLarge = i === 0;
             const spanClass = isLarge ? "sm:col-span-2 sm:row-span-2" : "col-span-1 row-span-1";
+            
+            const gradientClass = a.color || GRADIENTS[i % GRADIENTS.length];
 
             return (
             <Reveal key={i} delay={(i % 3) * 0.1} className={spanClass}>
@@ -98,7 +112,7 @@ export function FocusAreas() {
                 <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/50 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-0" />
 
                 {/* Hover Colored Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t ${a.color} opacity-0 transition-opacity duration-500 group-hover:opacity-90`} />
+                <div className={`absolute inset-0 bg-gradient-to-t ${gradientClass} opacity-0 transition-opacity duration-500 group-hover:opacity-90`} />
 
                 {/* Content Container */}
                 <div className="absolute inset-0 flex flex-col justify-end p-8 transition-transform duration-500">

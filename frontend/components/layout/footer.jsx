@@ -30,9 +30,31 @@ function YoutubeIcon({ className }) {
 }
 
 
+import { useSelector } from "react-redux"
+
 export function Footer() {
   const pathname = usePathname()
+  const { data: siteContent } = useSelector((state) => state.siteContent) || {}
   if (pathname?.startsWith("/admin") || pathname?.startsWith("/member")) return null
+
+  let site = { ...SITE }
+  if (siteContent?.contact_info?.content) {
+    try {
+      const parsed = JSON.parse(siteContent.contact_info.content)
+      if (parsed.address) site.address = parsed.address
+      if (parsed.email) site.email = parsed.email
+      if (parsed.phones && Array.isArray(parsed.phones)) {
+        const footerPhones = parsed.phones.filter(p => p.showInFooter).map(p => p.number).filter(Boolean)
+        if (footerPhones.length > 0) site.phones = footerPhones
+      } else if (parsed.phone) {
+        site.phones = [parsed.phone]
+      }
+      if (parsed.facebook) site.socials.facebook = parsed.facebook
+      if (parsed.instagram) site.socials.instagram = parsed.instagram
+      if (parsed.twitter) site.socials.twitter = parsed.twitter
+      if (parsed.youtube) site.socials.youtube = parsed.youtube
+    } catch(e) {}
+  }
 
   return (
     <footer className="relative overflow-hidden bg-navy text-navy-foreground">
@@ -45,15 +67,15 @@ export function Footer() {
             <div className="inline-flex rounded-xl bg-white p-2.5 shadow-sm">
               <Logo />
             </div>
-            <p className="mt-5 text-sm leading-relaxed text-white/65">{SITE.description}</p>
+            <p className="mt-5 text-sm leading-relaxed text-white/65">{site.description}</p>
             <div className="mt-6 flex items-center gap-2.5">
-              <a href={SITE.socials.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex size-6 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-accent hover:text-accent-foreground">
+              <a href={site.socials.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="inline-flex size-6 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-accent hover:text-accent-foreground">
                 <FacebookIcon className="size-5" />
               </a>
-              <a href={SITE.socials.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex size-6 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-accent hover:text-accent-foreground">
+              <a href={site.socials.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="inline-flex size-6 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-accent hover:text-accent-foreground">
                 <InstagramIcon className="size-5" />
               </a>
-              <a href={SITE.socials.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="inline-flex size-6 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-accent hover:text-accent-foreground">
+              <a href={site.socials.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="inline-flex size-6 items-center justify-center rounded-xl bg-white/10 text-white transition hover:bg-accent hover:text-accent-foreground">
                 <YoutubeIcon className="size-5" />
               </a>
             </div>
@@ -90,12 +112,12 @@ export function Footer() {
             <ul className="mt-4 space-y-4 text-sm text-white/65">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-accent" />
-                <span className="leading-relaxed">{SITE.address}</span>
+                <span className="leading-relaxed">{site.address}</span>
               </li>
               <li className="flex gap-3">
                 <Phone className="mt-0.5 size-4 shrink-0 text-accent" />
                 <span className="flex flex-col gap-0.5">
-                  {SITE.phones.map((p) => (
+                  {site.phones.map((p) => (
                     <a key={p} href={`tel:${p.replace(/\s/g, "")}`} className="hover:text-accent">
                       {p}
                     </a>
@@ -104,8 +126,8 @@ export function Footer() {
               </li>
               <li className="flex gap-3">
                 <Mail className="mt-0.5 size-4 shrink-0 text-accent" />
-                <a href={`mailto:${SITE.email}`} className="hover:text-accent">
-                  {SITE.email}
+                <a href={`mailto:${site.email}`} className="hover:text-accent">
+                  {site.email}
                 </a>
               </li>
             </ul>
@@ -121,7 +143,7 @@ export function Footer() {
 
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-5 text-xs text-white/45 md:flex-row">
-          <p>© {new Date().getFullYear()} {SITE.name}. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {site.name}. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/privacy-policy" className="hover:text-white transition">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition">Terms & Conditions</Link>

@@ -1,3 +1,8 @@
+"use client"
+
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchSiteContent } from "@/redux/features/siteContentSlice"
 import { PageHero } from "@/components/pages/page-hero"
 import { ContentSections } from "@/components/pages/content-sections"
 import { CtaBand } from "@/components/sections/cta-band"
@@ -5,9 +10,7 @@ import { SectionHeading } from "@/components/shared/section-heading"
 import { Reveal } from "@/components/shared/reveal"
 import { HeartHandshake, Eye, Target, ShieldCheck } from "lucide-react"
 
-export const metadata = { title: "Vision & Mission" }
-
-const sections = [
+const fallbackSections = [
   [
     "Our Vision",
     "To build a compassionate, inclusive society where every individual has the resources to lead a dignified life. We envision a future where poverty and lack of opportunity do not dictate a child's educational outcome or a family's health. By empowering the most vulnerable sections of our communities, we aim to eradicate inequality and foster a world driven by mutual support, continuous learning, and shared prosperity.",
@@ -42,18 +45,38 @@ const values = [
 ]
 
 export default function Page() {
+  const dispatch = useDispatch()
+  const { data: siteContent } = useSelector((state) => state.siteContent)
+
+  useEffect(() => {
+    dispatch(fetchSiteContent())
+  }, [dispatch])
+
+  let image = "/rural-classroom-children-learning-india.png"
+  let stats = ["Education for All", "Accessible Healthcare", "Community Empowerment"]
+  let sections = fallbackSections
+
+  if (siteContent?.vision_mission?.content) {
+    try {
+      const parsed = JSON.parse(siteContent.vision_mission.content)
+      if (parsed.image) image = parsed.image
+      if (Array.isArray(parsed.stats) && parsed.stats.length > 0) stats = parsed.stats
+      if (Array.isArray(parsed.sections) && parsed.sections.length > 0) sections = parsed.sections
+    } catch (e) {}
+  }
+
   return (
     <>
       <PageHero
         eyebrow="Vision & Mission"
         title="A fair chance to learn, grow and live with dignity."
         description="Our guiding principles for education, health, livelihood and public welfare."
-        image="/rural-classroom-children-learning-india.png"
+        image={image}
       />
 
       <ContentSections
-        image="/rural-classroom-children-learning-india.png"
-        stats={["Education for All", "Accessible Healthcare", "Community Empowerment"]}
+        image={image}
+        stats={stats}
         sections={sections}
       />
 

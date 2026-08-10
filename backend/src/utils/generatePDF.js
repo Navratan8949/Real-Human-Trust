@@ -100,31 +100,40 @@ const generateCertificatePDF = (certificate, memberName) => {
             doc.rect(35, 35, doc.page.width - 70, doc.page.height - 70).lineWidth(1).stroke('#93e018');
 
             // Header / Trust Info
-            doc.moveDown(1.5);
-            doc.fontSize(28).font('Helvetica-Bold').fillColor('#194c8f').text("Real Human Education & Charitable Trust", { align: "center" });
+            // Header / Trust Info
+            doc.fontSize(28).font('Helvetica-Bold').fillColor('#194c8f');
+            doc.moveDown(0.5);
+            doc.text("Real Human Education & Charitable Trust", { align: "center" });
             doc.fontSize(12).font('Helvetica').fillColor('#555555').text("1st Floor, DK Plaza Complex, New Naherunagar Nagar Main Road, Rajkot, Gujarat. 360002", { align: "center" });
 
             // Certificate Title
-            doc.moveDown(2);
-            doc.fontSize(36).font('Helvetica-Bold').fillColor('#f59e0b').text("CERTIFICATE OF APPRECIATION", { align: "center" });
+            doc.fontSize(36).font('Helvetica-Bold').fillColor('#f59e0b');
+            doc.moveDown(1);
+            doc.text("CERTIFICATE OF APPRECIATION", { align: "center" });
 
             // Subtitle
-            doc.moveDown(1.5);
-            doc.fontSize(16).font('Helvetica-Oblique').fillColor('#333333').text("This certificate is proudly presented to", { align: "center" });
+            doc.fontSize(16).font('Helvetica-Oblique').fillColor('#333333');
+            doc.moveDown(1);
+            doc.text("This certificate is proudly presented to", { align: "center" });
 
             // Member Name
-            doc.moveDown(1);
-            doc.fontSize(32).font('Helvetica-Bold').fillColor('#194c8f').text(memberName, { align: "center", underline: true });
+            doc.fontSize(32).font('Helvetica-Bold').fillColor('#194c8f');
+            doc.moveDown(0.5);
+            doc.text(memberName, { align: "center", underline: true });
 
             // Description / Title
+            doc.fontSize(14).font('Helvetica').fillColor('#333333');
             doc.moveDown(1.5);
-            doc.fontSize(14).font('Helvetica').fillColor('#333333').text("For outstanding contribution as:", { align: "center" });
+            doc.text("For outstanding contribution as:", { align: "center" });
+            
+            doc.fontSize(18).font('Helvetica-Bold').fillColor('#333333');
             doc.moveDown(0.5);
-            doc.fontSize(18).font('Helvetica-Bold').fillColor('#333333').text(certificate.title, { align: "center" });
+            doc.text(certificate.title, { align: "center" });
 
             if (certificate.description) {
+                doc.fontSize(14).font('Helvetica').fillColor('#555555');
                 doc.moveDown(1);
-                doc.fontSize(14).font('Helvetica').fillColor('#555555').text(certificate.description, (doc.page.width - 600) / 2, doc.y, {
+                doc.text(certificate.description, (doc.page.width - 600) / 2, doc.y, {
                     align: "center",
                     width: 600
                 });

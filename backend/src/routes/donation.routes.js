@@ -1,5 +1,5 @@
 const express = require("express");
-const { createOrder, verifyPayment, getAllDonations, getMyDonations, createManualDonation, verifyManualDonation } = require("../controllers/donation.controller");
+const { createOrder, verifyPayment, getAllDonations, getMyDonations, createManualDonation, verifyManualDonation, getDonationById } = require("../controllers/donation.controller");
 const isAuthenticated = require("../middleware/auth");
 const authorizeRoles = require("../middleware/role");
 const upload = require("../utils/multer");
@@ -14,6 +14,9 @@ router.get("/me", isAuthenticated, getMyDonations);
 
 // Manual Donation Routes
 router.post("/manual", checkOptionalAuth, upload.single("paymentProof"), createManualDonation);
+
+// Get single donation by id (public for receipt, but requires valid ID)
+router.get("/:id", getDonationById);
 
 // Admin route
 router.get("/", isAuthenticated, authorizeRoles(["super_admin", "admin", "manager"]), getAllDonations);

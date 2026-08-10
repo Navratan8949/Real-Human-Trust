@@ -287,3 +287,19 @@ exports.verifyManualDonation = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+exports.getDonationById = async (req, res) => {
+    try {
+        const donation = await Donation.findById(req.params.id)
+            .populate("project", "title")
+            .populate("campaign", "title");
+
+        if (!donation) {
+            return res.status(404).json({ success: false, message: "Donation not found" });
+        }
+
+        res.status(200).json({ success: true, donation });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Invalid donation ID or server error" });
+    }
+};
