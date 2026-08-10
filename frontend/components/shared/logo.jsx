@@ -13,13 +13,13 @@ export function Logo({ variant = "dark", showText = true, className = "" }) {
         alt={`${SITE.shortName} logo`}
         width={400}
         height={400}
-        className="size-11 sm:size-16 shrink-0 object-contain"
+        className="size-12 sm:size-16 shrink-0 object-contain"
         priority
       />
       {showText && (
         <span className="notranslate flex flex-col leading-tight min-w-0">
-          <span className={`font-serif text-xs sm:text-base font-bold tracking-tight ${textColor} truncate`}>Real Human</span>
-          <span className={`text-[8px] sm:text-[10px] font-medium uppercase tracking-wider sm:tracking-[0.14em] ${subColor} truncate`}>
+          <span className={`font-serif text-sm sm:text-base font-bold tracking-tight ${textColor} truncate`}>Real Human</span>
+          <span className={`text-[9px] sm:text-[10px] font-medium uppercase tracking-wider sm:tracking-[0.14em] ${subColor} truncate`}>
             Education & Charitable Trust
           </span>
         </span>
