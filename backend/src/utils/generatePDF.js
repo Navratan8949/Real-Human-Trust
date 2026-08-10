@@ -118,12 +118,13 @@ const generateCertificatePDF = (certificate, memberName) => {
 
             // Description / Title
             doc.moveDown(1.5);
-            doc.fontSize(14).font('Helvetica').fillColor('#333333').text(`For outstanding contribution as: `, { continued: true, align: "center" })
-                .font('Helvetica-Bold').text(`${certificate.title}`, { align: "center" });
+            doc.fontSize(14).font('Helvetica').fillColor('#333333').text("For outstanding contribution as:", { align: "center" });
+            doc.moveDown(0.5);
+            doc.fontSize(18).font('Helvetica-Bold').fillColor('#333333').text(certificate.title, { align: "center" });
 
             if (certificate.description) {
                 doc.moveDown(1);
-                doc.fontSize(14).font('Helvetica').fillColor('#555555').text(certificate.description, {
+                doc.fontSize(14).font('Helvetica').fillColor('#555555').text(certificate.description, (doc.page.width - 600) / 2, doc.y, {
                     align: "center",
                     width: 600
                 });
