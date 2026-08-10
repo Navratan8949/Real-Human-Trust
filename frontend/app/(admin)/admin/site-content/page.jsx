@@ -199,20 +199,20 @@ export default function SiteContentAdminPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-8 flex flex-wrap h-auto gap-2 justify-start bg-secondary/30 p-2 rounded-xl">
-          <TabsTrigger value="founder_message">Founder</TabsTrigger>
-          <TabsTrigger value="home_hero">Hero Slider</TabsTrigger>
-          <TabsTrigger value="about_preview">About (Home)</TabsTrigger>
-          <TabsTrigger value="about_main">About (Main)</TabsTrigger>
-          <TabsTrigger value="vision_mission">Vision & Mission</TabsTrigger>
-          <TabsTrigger value="focus_areas">Focus Areas</TabsTrigger>
-          <TabsTrigger value="impact_stats">Impact Stats</TabsTrigger>
-          <TabsTrigger value="store_info">Store / Impact</TabsTrigger>
-          <TabsTrigger value="faqs">FAQs</TabsTrigger>
-          <TabsTrigger value="legal_pages">Legal (Privacy/Terms)</TabsTrigger>
-          <TabsTrigger value="contact_info">Contact Info</TabsTrigger>
-          <TabsTrigger value="donate_details">Donate Details</TabsTrigger>
-          <TabsTrigger value="fund_allocation">Fund Allocation</TabsTrigger>
+        <TabsList className="w-full justify-start mb-8 flex overflow-x-auto gap-2 bg-secondary/30 p-2 rounded-xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <TabsTrigger value="founder_message" className="shrink-0">Founder</TabsTrigger>
+          <TabsTrigger value="home_hero" className="shrink-0">Hero Slider</TabsTrigger>
+          <TabsTrigger value="about_preview" className="shrink-0">About (Home)</TabsTrigger>
+          <TabsTrigger value="about_main" className="shrink-0">About (Main)</TabsTrigger>
+          <TabsTrigger value="vision_mission" className="shrink-0">Vision & Mission</TabsTrigger>
+          <TabsTrigger value="focus_areas" className="shrink-0">Focus Areas</TabsTrigger>
+          <TabsTrigger value="impact_stats" className="shrink-0">Impact Stats</TabsTrigger>
+          <TabsTrigger value="store_info" className="shrink-0">Store / Impact</TabsTrigger>
+          <TabsTrigger value="faqs" className="shrink-0">FAQs</TabsTrigger>
+          <TabsTrigger value="legal_pages" className="shrink-0">Legal (Privacy/Terms)</TabsTrigger>
+          <TabsTrigger value="contact_info" className="shrink-0">Contact Info</TabsTrigger>
+          <TabsTrigger value="donate_details" className="shrink-0">Donate Details</TabsTrigger>
+          <TabsTrigger value="fund_allocation" className="shrink-0">Fund Allocation</TabsTrigger>
         </TabsList>
 
         {/* FOUNDER MESSAGE TAB */}
